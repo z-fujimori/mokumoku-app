@@ -1,0 +1,80 @@
+import React from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { TextField, Button, Typography, Container } from "@mui/material";
+import { supabase } from "../../lib/supabaseClient";
+import { signupSchema } from "../../lib/authSchema";
+import { z } from "zod";
+
+type SignupData = z.infer<typeof signupSchema>;
+
+const SignupForm: React.FC = () => {
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<SignupData>({
+        resolver: zodResolver(signupSchema),
+    });
+
+    const onSubmit = async (input: SignupData) => {
+        const { email, password } = input;
+        const { data, error } = await supabase.auth.signUp({ email, password });
+
+        if (error) {
+            console.error("サインアップエラー:", error.message);
+            return;
+        }
+
+        console.log("サインアップ成功:", data);
+        alert("確認メールが送信されました。メールを確認してください。");
+    };
+
+    return (
+        <Container maxWidth="xs">
+            <Typography variant="h5" align="center">
+                サインアップ
+            </Typography>
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Controller
+                    name="email"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            label="メールアドレス"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                        />
+                    )}
+                />
+                <Controller
+                    name="password"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                        <TextField
+                            {...field}
+                            label="パスワード"
+                            type="password"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            error={!!errors.password}
+                            helperText={errors.password?.message}
+                        />
+                    )}
+                />
+                <Button type="submit" fullWidth variant="contained" color="primary">
+                    登録
+                </Button>
+            </form>
+        </Container>
+    );
+};
+
+export default SignupForm;
