@@ -25,3 +25,8 @@ serde_json = "1"
 tauri-plugin-stronghold = "2"
 rust-argon2 = "2.1"
 iota_stronghold = "2.0.0"
+sqlx = { version = "0.8.3", features = ["runtime-tokio-rustls", "sqlite", "migrate"] }
+tokio = { version = "1.43.0", features = ["full"] }
+futures = "0.3.31"
+directories = "6.0.0"
+dunce = "1.0.5"

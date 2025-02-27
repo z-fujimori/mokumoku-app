@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS user_infos (
+    id INTEGER PRIMARY KEY,
+    token TEXT NOT NULL
+);
+
+
+
