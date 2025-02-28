@@ -1,4 +1,5 @@
 import React from "react";
+import { invoke } from '@tauri-apps/api/core';
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TextField, Button, Typography, Container } from "@mui/material";
@@ -19,17 +20,19 @@ const LoginForm: React.FC = () => {
 
     const onSubmit = async (input: LoginData) => {
         const { email, password } = input;
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        const ret_token = await invoke<string>("login", {"email": email, "password": password})
+            .catch(err => {console.error(err); return "error";});
+        // const { data, error } = await supabase.auth.signInWithPassword({
+        //     email,
+        //     password,
+        // });
 
-        if (error) {
-            console.error("ログインエラー:", error.message);
-            return;
-        }
+        // if (error) {
+        //     console.error("ログインエラー:", error.message);
+        //     return;
+        // }
 
-        console.log("ログイン成功:", data);
+        console.log("ログイン成功:", ret_token);
         alert("ログインに成功しました！");
     };
 
