@@ -22,19 +22,31 @@ pub async  fn login(sqlite_pool: State<'_, sqlx::SqlitePool>, email: String, pas
         .map_err(|e| format!("Client build error: {:?}", e))?;
     let url = "https://crojyohgwneomqasuuaq.supabase.co/auth/v1/signup";
     let response = client
-        .get(url)
+        .post(url)
         .header( CONTENT_TYPE, "application/json")
         .header( "apikey", secret_key)
+        .json(&LoginRequest {
+            email: email.to_string(),
+            password: password.to_string(),
+        })
         .send()
-        .await;
+        .await
+        .map_err(|e| format!("HTTP request error: {:?}", e))?;
 
-    let token: LoginResponse = response
-        .expect("error while running tauri application")
-        .json().await
-        .expect("error while running tauri application");
-    println!("{:?}",token);
+        // HTTP レスポンスのステータスをチェック
+        let status = response.status();
+        let body = response.text().await.map_err(|e| format!("Failed to read response: {:?}", e))?;
 
-    Ok(token.token)
+        if !status.is_success() {
+            return Err(format!("Login failed: HTTP {} - {}", status, body));
+        }
+
+        // JSON をパース
+        let token: LoginResponse = serde_json::from_str(&body)
+            .map_err(|e| format!("Failed to parse JSON: {:?}, body: {}", e, body))?;
+
+        println!("ログイントークン取得成功: {:?}", token.access_token);
+        Ok(token.access_token)
 }
 
 #[tauri::command]
