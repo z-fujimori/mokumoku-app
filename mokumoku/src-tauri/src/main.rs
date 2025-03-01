@@ -46,7 +46,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // secure_session::get,
             // secure_session::get2,
             // secure_session::insert_get,
-            auth::login
+            auth::check_auth,
+            auth::login,
+            auth::signup
         ])
         .setup(|app| {
             app.manage(sqlite_pool);

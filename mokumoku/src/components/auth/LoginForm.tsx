@@ -21,7 +21,7 @@ const LoginForm: React.FC = () => {
     const onSubmit = async (input: LoginData) => {
         const { email, password } = input;
         const ret_token = await invoke<string>("login", {"email": email, "password": password})
-            .catch(err => {console.error(err); return "error";});
+            .catch(err => {console.error(err); return "";});
         // const { data, error } = await supabase.auth.signInWithPassword({
         //     email,
         //     password,
