@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS tasks {
+    id INTEGER PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    
+}
