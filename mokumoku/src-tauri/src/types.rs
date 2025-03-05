@@ -18,3 +18,15 @@ pub struct LoginResponse {
     pub access_token: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Token {
+    pub token: String
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct StoreTask {
+    pub name: String,
+    pub assignment: f64,
+    pub interval: i64
+}
+

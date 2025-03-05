@@ -8,7 +8,7 @@ use directories::ProjectDirs;
 use tauri::Manager;
 
 use crate::database::data;
-use crate::handlers::{secure_session, auth};
+use crate::handlers::{secure_session, auth, task};
 use types::{User, LoginRequest, LoginResponse};
 
 
@@ -48,7 +48,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // secure_session::insert_get,
             auth::check_auth,
             auth::login,
-            auth::signup
+            auth::signup,
+            task::add_task
         ])
         .setup(|app| {
             app.manage(sqlite_pool);

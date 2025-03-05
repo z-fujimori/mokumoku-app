@@ -2,6 +2,10 @@ CREATE TABLE IF NOT EXISTS user_infos (
     id INTEGER PRIMARY KEY,
     token TEXT NOT NULL
 );
-
-
+CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    assignment INTEGER NOT NULL,
+    interval INTEGER NOT NULL
+);
 
