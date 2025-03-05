@@ -1,6 +1,9 @@
 import React from 'react'
+import { invoke } from '@tauri-apps/api/core';
 import { MdDriveFileRenameOutline, MdOutlineCancel } from "react-icons/md";
 import { TreeState } from '../../types/tree';
+import { useForm } from 'react-hook-form';
+import { Add_task } from '../../types/task';
 
 const CreateTaskModal = (props:{
     modalState: number,
@@ -8,9 +11,11 @@ const CreateTaskModal = (props:{
     itemsState: TreeState[],
     setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>
 }) => {
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<Add_task>();
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault(); // デフォルトの submit を防ぐ
+    const onSubmit = async (data: Add_task) => {
+        console.log(data);
+        await invoke<string>("add_task", data).then((res) => console.log(res)).catch((err) => console.error(err));
         let newState = props.itemsState;
         newState[props.modalState] = TreeState.seed;
         props.setItemsState(newState);
@@ -22,11 +27,11 @@ const CreateTaskModal = (props:{
             <div className="bg-white p-6 rounded-lg shadow-lg w-[450px]" onClick={(e)=>{e.stopPropagation();}}>
                 {/* <h2 className="text-xl font-bold text-gray-700 mb-4">目標設定</h2> */}
 
-                <form className="space-y-4" onSubmit={(e)=>handleSubmit(e)}>
+                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                     <div className='flex items-center justify-between'>
                         <input
                             type="text"
-                            name="name"
+                            {...register("name", { required: "タスク名を入力しよう！" })}
                             placeholder="何をやる？"
                             value={"理論と実装"}
                             // onChange={}
@@ -38,6 +43,7 @@ const CreateTaskModal = (props:{
                     <div className='flex items-center justify-between'>
                         <input
                             type="number"
+                            {...register("assignment", { required: "ノルマを設定しよう！", valueAsNumber: true })}
                             name="assignment"
                             placeholder="どのくらいやる？"
                             value={1}
@@ -47,8 +53,7 @@ const CreateTaskModal = (props:{
                         />
                         <div className="">
                             <select
-                            name="service"
-                            // value={}
+                            {...register("service", {})}
                             // onChange={handleChange}
                             className="w-full border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             required
@@ -63,7 +68,7 @@ const CreateTaskModal = (props:{
                     </div>
                     <div className='flex items-center justify-start'>
                         <input
-                            type='number'
+                            {...register("interval", { required: "頻度を設定しよう！", valueAsNumber: true })}
                             name="interval"
                             placeholder="何日ごとやる？(ex.1日)"
                             value={1}
