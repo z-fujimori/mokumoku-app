@@ -11,9 +11,10 @@ const CreateTaskModal = (props:{
     itemsState: TreeState[],
     setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>
 }) => {
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<Add_task>();
+    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<Add_task>();
 
     const onSubmit = async (data: Add_task) => {
+        setValue("plase", props.modalState);
         console.log(data);
         await invoke<string>("add_task", data).then((res) => console.log(res)).catch((err) => console.error(err));
         let newState = props.itemsState;
@@ -91,6 +92,7 @@ const CreateTaskModal = (props:{
                             <MdDriveFileRenameOutline className='text-2xl' />
                         </button>
                     </div>
+                    <input className='hidden' type="text" {...register("plase", { valueAsNumber: true })} value={props.modalState} />
                 </form>
             </div>
         </div>

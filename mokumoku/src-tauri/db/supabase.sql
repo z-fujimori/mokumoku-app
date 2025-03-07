@@ -9,6 +9,23 @@ CREATE TABLE IF NOT EXISTS tasks (
 );
 CREATE TABLE IF NOT EXISTS stamps (
     id INTEGER PRIMARY KEY,
-    task_id INTEGER NOT NULL
+    task_id INTEGER NOT NULL,
+    FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
+);
+
+->
+
+CREATE TABLE IF NOT EXISTS tasks (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL DEFAULT auth.uid(),
+    name TEXT NOT NULL,
+    assignment REAL NOT NULL,
+    service TEXT NOT NULL,
+    interval INTEGER NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS stamps (
+    id SERIAL PRIMARY KEY,
+    task_id INTEGER NOT NULL,
     FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
 );
