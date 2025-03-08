@@ -13,6 +13,7 @@ pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<V
     let query = "SELECT 
         bords.id AS plase_id, 
         bords.plase,
+        bords.tree_state_id,
         tasks.id AS task_id,
         tasks.name AS name,
         tasks.assignment AS assignment,
@@ -27,13 +28,14 @@ pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<V
     while let Some(row) = rows.try_next().await.map_err(|e| e.to_string())? {
         let plase_id: i64 = row.try_get("plase_id").map_err(|e| e.to_string())?;
         let plase: String = row.try_get("plase").map_err(|e| e.to_string())?;
+        let tree_state_id: i32 = row.try_get("tree_state_id").map_err(|e| e.to_string())?;
         let task_id: i32 = row.try_get("task_id").map_err(|e| e.to_string())?;
         let name: String = row.try_get("name").map_err(|e| e.to_string())?;
         let assignment: f64 = row.try_get("assignment").map_err(|e| e.to_string())?;
         let service: String = row.try_get("service").map_err(|e| e.to_string())?;
         let interval: i64 = row.try_get("interval").map_err(|e| e.to_string())?;
     
-        tasks.insert(plase_id, PlaseWithTask{plase_id, plase, task_id, name, assignment, service, interval});
+        tasks.insert(plase_id, PlaseWithTask{plase_id, plase, tree_state_id, task_id, name, assignment, service, interval});
     }
     println!("{:?}", tasks);
 
@@ -107,6 +109,20 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
         .bind(Position::from_number(plase as i32).to_string())
         .bind(local_task.last_insert_rowid())
         .bind(plase)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| e.to_string())?;
+    tx.commit().await.map_err(|e| e.to_string())?;
+
+    Ok("ok".to_string())
+}
+
+#[tauri::command]
+pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bord_id: i64, tree_state: i64) ->Result<String, String> {
+    let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
+    sqlx::query("UPDATE bords SET tree_state_id = ? WHERE id = ?")
+        .bind((tree_state+1)%5)
+        .bind(bord_id)
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;

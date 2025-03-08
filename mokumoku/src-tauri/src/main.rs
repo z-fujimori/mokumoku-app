@@ -50,7 +50,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             auth::login,
             auth::signup,
             task::add_task, 
-            task::get_tasks_info
+            task::get_tasks_info,
+            task::grow_tree
         ])
         .setup(|app| {
             app.manage(sqlite_pool);

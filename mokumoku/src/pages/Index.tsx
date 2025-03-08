@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { invoke } from '@tauri-apps/api/core';
 import Plus from '../components/tree/Plus'
 import Item from '../components/tree/Item'
 import { TreeState } from '../types/tree'
 import CreateTaskModal from '../components/index/CreateTaskModal'
 import TaskModal from '../components/index/ TaskModal'
+import { PlaseWithTask } from '../types/task';
 
 const Index = () => {
   // const [leftItem, setLeftItem] = useState<TreeState>(0);
@@ -13,6 +14,7 @@ const Index = () => {
   const [items, setItems] = useState<TreeState[]>([0,0,0,0]);
   const [createTaskModalState, setCreateTaskModalState] = useState(0);
   const [taskModalState, setTaskModalState] = useState(0);
+  const [bordInfo, setBordInfo] = useState<PlaseWithTask[]>([])
 
   function changeItemState(state: TreeState, setState: React.Dispatch<React.SetStateAction<TreeState>>) {
     const newState = (state + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
@@ -24,6 +26,17 @@ const Index = () => {
     await invoke<any>("get_tasks_info").then((res) => console.log(res)).catch((err) => console.error(err));
   }
 
+  useEffect(() => {
+    (async () => {
+      const tasks = await invoke<PlaseWithTask[]>("get_tasks_info", {})
+        .catch(err => {
+          console.error(err)
+          return []
+        });
+      setBordInfo(tasks);
+    })();
+  },[])
+
   return (
     <div>
       <div className='w-screen h-[80vh] flex flex-col items-center justify-center'>
@@ -34,13 +47,13 @@ const Index = () => {
 
         <div className='h-3/5 flex items-center justify-between'>
           {/* <button onClick={()=>changeItemState(leftItem,setLeftItem)}> */}
-            <Item itemNum={1} itemsState={items} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
+            <Item itemNum={1} itemsState={bordInfo} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
           {/* </button> */}
           {/* <button onClick={()=>changeItemState(centerItem,setCenterItem)}> */}
-            <Item itemNum={2} itemsState={items} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
+            <Item itemNum={2} itemsState={bordInfo} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
           {/* </button> */}
           {/* <button onClick={()=>changeItemState(rightItem,setRightItem)}> */}
-            <Item itemNum={3} itemsState={items} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
+            <Item itemNum={3} itemsState={bordInfo} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
           {/* </button> */}
         </div>
 
@@ -49,8 +62,8 @@ const Index = () => {
         </div>
       </div>
 
-      {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={items} setItemsState={setItems} /> : <></>}
-      {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={items} setItemsState={setItems} /> : <></>}
+      {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={bordInfo} setItemsState={setItems} /> : <></>}
+      {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={bordInfo} setItemsState={setItems} /> : <></>}
 
       <div className='w-screen h-[20vh] bg-slate-700'>
         メニュー

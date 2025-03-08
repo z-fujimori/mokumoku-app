@@ -36,6 +36,7 @@ pub struct StoreTask {
 pub struct PlaseWithTask {
     pub plase_id: i64,
     pub plase: String,
+    pub tree_state_id: i32,
     pub task_id: i32,
     pub name: String,
     pub assignment: f64,
