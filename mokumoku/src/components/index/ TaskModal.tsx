@@ -1,18 +1,26 @@
 import React from 'react'
 import { TreeState } from '../../types/tree'
+import { invoke } from '@tauri-apps/api/core'
+import { PlaseWithTask } from '../../types/task'
 
 const  TaskModal = (props:{
     modalState: number,
-    setModalState: React.Dispatch<React.SetStateAction<number>>
-    itemsState: TreeState[],
-    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>
+    setModalState: React.Dispatch<React.SetStateAction<number>>,
+    itemsState: number,
+    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>,
+    setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 
-    function taskCompleted() {
-        let newState = [...props.itemsState];
-        newState[props.modalState] = (props.itemsState[props.modalState] + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
-        console.log(newState);
-        props.setItemsState(newState);
+    async function taskCompleted() {
+        console.log("🚀 invoke するデータ:", { bord_id: props.modalState, tree_state: props.itemsState });
+        await invoke<string>("grow_tree", {bordId: props.modalState, treeState: props.itemsState})
+            .then((res) => console.log(res)).catch((err) => console.error(err));
+        
+        // let newState = [...props.itemsState];
+        // newState[props.modalState] = (props.itemsState[props.modalState] + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
+        // console.log(newState);
+        // props.setItemsState(newState);
+        props.setChangeBordInfo(true);
         props.setModalState(0);
     }
 

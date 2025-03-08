@@ -11,13 +11,14 @@ import { PlaseWithTask } from '../../types/task'
 const Item = (props:{
     itemNum: number,
     itemsState: PlaseWithTask[],
-    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>
-    setCreateTaskModalState: React.Dispatch<React.SetStateAction<number>>
+    treeState: number,
+    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>,
+    setCreateTaskModalState: React.Dispatch<React.SetStateAction<number>>,
     setTaskModalState: React.Dispatch<React.SetStateAction<number>>
 }) => {
 
     function clickItem() {
-        if (props.itemsState[props.itemNum].tree_state_id == TreeState.none) {
+        if (props.treeState == TreeState.none) {
             props.setCreateTaskModalState(props.itemNum)
         } else {
             props.setTaskModalState(props.itemNum)
@@ -28,12 +29,12 @@ const Item = (props:{
         <>
         <button onClick={()=>{clickItem()}}>
             <div className='p-10 w-56 flex justify-center items-center'>
-                {props.itemsState[props.itemNum].tree_state_id == TreeState.none && <Plus />}
-                {props.itemsState[props.itemNum].tree_state_id == TreeState.seed && <Seed />}
-                {props.itemsState[props.itemNum].tree_state_id == TreeState.sprout && <Sprout />}
-                {props.itemsState[props.itemNum].tree_state_id == TreeState.tree && <Tree />}
-                {props.itemsState[props.itemNum].tree_state_id == TreeState.nut && <Nut />}
-                {props.itemsState[props.itemNum].tree_state_id == TreeState.dead && <Dead />}
+                {props.treeState == TreeState.none && <Plus />}
+                {props.treeState == TreeState.seed && <Seed />}
+                {props.treeState == TreeState.sprout && <Sprout />}
+                {props.treeState == TreeState.tree && <Tree />}
+                {props.treeState == TreeState.nut && <Nut />}
+                {props.treeState == TreeState.dead && <Dead />}
             </div>
         </button>
         </>

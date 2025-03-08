@@ -105,9 +105,10 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;
-    sqlx::query("UPDATE bords SET plase = ?, task_id = ? WHERE id = ?")
+    sqlx::query("UPDATE bords SET plase = ?, task_id = ?, tree_state_id = ? WHERE id = ?")
         .bind(Position::from_number(plase as i32).to_string())
         .bind(local_task.last_insert_rowid())
+        .bind(1)
         .bind(plase)
         .execute(&mut *tx)
         .await
@@ -118,11 +119,11 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
 }
 
 #[tauri::command]
-pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bord_id: i64, tree_state: i64) ->Result<String, String> {
+pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, treeState: i64) ->Result<String, String> {
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
     sqlx::query("UPDATE bords SET tree_state_id = ? WHERE id = ?")
-        .bind((tree_state+1)%5)
-        .bind(bord_id)
+        .bind((treeState+1)%5 + (treeState+1)/5)
+        .bind(bordId)
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;
