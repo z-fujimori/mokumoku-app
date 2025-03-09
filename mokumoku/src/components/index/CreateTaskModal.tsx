@@ -3,22 +3,25 @@ import { invoke } from '@tauri-apps/api/core';
 import { MdDriveFileRenameOutline, MdOutlineCancel } from "react-icons/md";
 import { TreeState } from '../../types/tree';
 import { useForm } from 'react-hook-form';
-import { Add_task } from '../../types/task';
+import { Add_task, PlaseWithTask } from '../../types/task';
 
 const CreateTaskModal = (props:{
     modalState: number,
-    setModalState: React.Dispatch<React.SetStateAction<number>>
-    itemsState: TreeState[],
-    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>
+    setModalState: React.Dispatch<React.SetStateAction<number>>,
+    itemsState: PlaseWithTask[],
+    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>,
+    setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<Add_task>();
+    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<Add_task>();
 
     const onSubmit = async (data: Add_task) => {
+        setValue("plase", props.modalState);
         console.log(data);
         await invoke<string>("add_task", data).then((res) => console.log(res)).catch((err) => console.error(err));
-        let newState = props.itemsState;
-        newState[props.modalState] = TreeState.seed;
-        props.setItemsState(newState);
+        props.setChangeBordInfo(true);
+        // let newState = props.itemsState;
+        // newState[props.modalState] = TreeState.seed;
+        // props.setItemsState(newState);
         props.setModalState(0);
     }
 
@@ -91,6 +94,7 @@ const CreateTaskModal = (props:{
                             <MdDriveFileRenameOutline className='text-2xl' />
                         </button>
                     </div>
+                    <input className='hidden' type="text" {...register("plase", { valueAsNumber: true })} value={props.modalState} />
                 </form>
             </div>
         </div>

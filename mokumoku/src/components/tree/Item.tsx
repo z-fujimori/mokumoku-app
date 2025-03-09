@@ -6,22 +6,22 @@ import Sprout from './Sprout'
 import Tree from './Tree'
 import Nut from './Nut'
 import Dead from './Dead'
+import { PlaseWithTask } from '../../types/task'
 
 const Item = (props:{
     itemNum: number,
-    itemsState: TreeState[],
-    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>
-    setCreateTasckModalState: React.Dispatch<React.SetStateAction<number>>
+    itemsState: PlaseWithTask[],
+    treeState: number,
+    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>,
+    setCreateTaskModalState: React.Dispatch<React.SetStateAction<number>>,
+    setTaskModalState: React.Dispatch<React.SetStateAction<number>>
 }) => {
 
     function clickItem() {
-        if (props.itemsState[props.itemNum] == TreeState.none) {
-            props.setCreateTasckModalState(props.itemNum)
+        if (props.treeState == TreeState.none) {
+            props.setCreateTaskModalState(props.itemNum)
         } else {
-            let newState = [...props.itemsState];
-            newState[props.itemNum] = (props.itemsState[props.itemNum] + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
-            console.log(newState);
-            props.setItemsState(newState);
+            props.setTaskModalState(props.itemNum)
         }
     }
 
@@ -29,12 +29,12 @@ const Item = (props:{
         <>
         <button onClick={()=>{clickItem()}}>
             <div className='p-10 w-56 flex justify-center items-center'>
-                {props.itemsState[props.itemNum] == TreeState.none && <Plus />}
-                {props.itemsState[props.itemNum] == TreeState.seed && <Seed />}
-                {props.itemsState[props.itemNum] == TreeState.sprout && <Sprout />}
-                {props.itemsState[props.itemNum] == TreeState.tree && <Tree />}
-                {props.itemsState[props.itemNum] == TreeState.nut && <Nut />}
-                {props.itemsState[props.itemNum] == TreeState.dead && <Dead />}
+                {props.treeState == TreeState.none && <Plus />}
+                {props.treeState == TreeState.seed && <Seed />}
+                {props.treeState == TreeState.sprout && <Sprout />}
+                {props.treeState == TreeState.tree && <Tree />}
+                {props.treeState == TreeState.nut && <Nut />}
+                {props.treeState == TreeState.dead && <Dead />}
             </div>
         </button>
         </>
