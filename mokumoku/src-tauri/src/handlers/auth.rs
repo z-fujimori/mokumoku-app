@@ -46,8 +46,9 @@ pub async fn login(sqlite_pool: State<'_, sqlx::SqlitePool>, email: &str, passwo
 
     // tokenをlocalに保存
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
-    sqlx::query("INSERT INTO user_infos (token) VALUES (?)")
+    sqlx::query("INSERT INTO user_infos (access_token, refresh_token) VALUES (?, ?)")
         .bind(token.access_token)
+        .bind("リフレッシュ")
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;
@@ -100,8 +101,9 @@ pub async  fn signup(sqlite_pool: State<'_, sqlx::SqlitePool>, email: String, pa
 
     // tokenをlocalに保存
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
-    sqlx::query("INSERT INTO user_infos (token) VALUES (?)")
+    sqlx::query("INSERT INTO user_infos (access_token, refresh_token) VALUES (?, ?)")
         .bind(token.access_token)
+        .bind(token.refresh_token)
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;
@@ -109,4 +111,14 @@ pub async  fn signup(sqlite_pool: State<'_, sqlx::SqlitePool>, email: String, pa
 
     // Ok(token.access_token)
     Ok(true)
+}
+
+#[tauri::command]
+pub async fn refresh(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<String, String> {
+    let url = env::var("VITE_SUPABASE_URL").expect("VITE_SUPABASE_URL not set in .env") + "/auth/v1/token?grant_type=refresh_token";
+    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+
+    
+
+    Ok("ok".to_string())
 }

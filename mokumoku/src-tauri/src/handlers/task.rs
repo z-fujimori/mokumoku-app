@@ -52,12 +52,12 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
         .map_err(|e| e.to_string())?;
 
     let token: String = row
-        .map(|row| Token {token: row.get("token"),})
+        .map(|row| Token {token: row.get("access_token"),})
         .map(|token| token.token) // `Option<Token>` を `Option<String>` に変換
         .unwrap_or("".to_string());
 
     // println!("{:?}", token);
-    println!("get token");
+    println!("get token, {}", token);
 
     let url = "https://crojyohgwneomqasuuaq.supabase.co/rest/v1/tasks";
     dotenv().ok();
@@ -123,6 +123,20 @@ pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, tr
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
     sqlx::query("UPDATE bords SET tree_state_id = ? WHERE id = ?")
         .bind((treeState+1)%5 + (treeState+1)/5)
+        .bind(bordId)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| e.to_string())?;
+    tx.commit().await.map_err(|e| e.to_string())?;
+
+    Ok("ok".to_string())
+}
+
+#[tauri::command]
+pub async fn off_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64) ->Result<String, String> {
+    let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
+    sqlx::query("UPDATE bords SET task_id = NULL, tree_state_id = ? WHERE id = ?")
+        .bind(0)
         .bind(bordId)
         .execute(&mut *tx)
         .await

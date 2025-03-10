@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS user_infos (
     id INTEGER PRIMARY KEY,
-    token TEXT NOT NULL
+    access_token TEXT NOT NULL,
+    refresh_token TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY,

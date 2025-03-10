@@ -68,7 +68,7 @@ const Index = (props:{
       </div>
 
       {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={bordInfo} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
-      {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={bordInfo[taskModalState-1].tree_state_id} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
+      {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={bordInfo[taskModalState-1]} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
 
       <div className='w-screen h-[20vh] bg-slate-700'>
         メニュー
