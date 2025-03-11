@@ -2,13 +2,15 @@ import React from "react";
 import SignupForm from "../components/auth/SignupForm";
 import LoginForm from "../components/auth/LoginForm";
 
-const AuthPage: React.FC = () => {
+const AuthPage = (props:{
+    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
 
 
     return (
         <div>
-            <SignupForm />
-            <LoginForm />
+            <SignupForm setIsUpdateViewState={props.setIsUpdateViewState} />
+            <LoginForm setIsUpdateViewState={props.setIsUpdateViewState} />
             {/* <LogoutButton /> */}
         </div>
     );

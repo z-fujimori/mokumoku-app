@@ -1,5 +1,5 @@
 import React from 'react'
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '@tauri-apps/api/core'
 import { MdDriveFileRenameOutline, MdOutlineCancel } from "react-icons/md";
 import { TreeState } from '../../types/tree';
 import { useForm } from 'react-hook-form';
@@ -61,11 +61,11 @@ const CreateTaskModal = (props:{
                             className="w-full border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             required
                             >
-                            <option value="" disabled>単位</option>
-                            <option value="h">時間</option>
-                            <option value="p">ページ</option>
-                            <option value="ｺ">個</option>
-                            <option value="-">なし</option>
+                                <option value="" disabled>単位</option>
+                                <option value="h">時間</option>
+                                <option value="p">ページ</option>
+                                <option value="ｺ">個</option>
+                                <option value="-">なし</option>
                             </select>
                         </div>
                     </div>

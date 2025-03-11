@@ -6,14 +6,18 @@ import { TreeState } from '../types/tree'
 import CreateTaskModal from '../components/index/CreateTaskModal'
 import TaskModal from '../components/index/ TaskModal'
 import { PlaseWithTask } from '../types/task';
+import MenuIcon from '../components/index/MenuIcon';
+import AuthModal from '../components/index/AuthModal';
 
 const Index = (props:{
   bordInfo: PlaseWithTask[],
-  setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>
+  setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   const [items, setItems] = useState<TreeState[]>([0,0,0,0]);
   const [createTaskModalState, setCreateTaskModalState] = useState(0);
   const [taskModalState, setTaskModalState] = useState(0);
+  const [authModalState, setAuthModalState] = useState(0);
   // const [bordInfo, setBordInfo] = useState<PlaseWithTask[]>([]);
   // const [changeBordInfo, setChangeBordInfo] = useState(false);
   const bordInfo = props.bordInfo;
@@ -69,9 +73,14 @@ const Index = (props:{
 
       {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={bordInfo} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
       {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={bordInfo[taskModalState-1]} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
+      {authModalState != 0 ? <AuthModal setAuthModalState={setAuthModalState}  setIsUpdateViewState={props.setIsUpdateViewState} /> : <></>}
 
       <div className='w-screen h-[20vh] bg-slate-700'>
-        メニュー
+        <div className='flex items-center justify-center h-full'>
+          <MenuIcon setAuthModalState={setAuthModalState} />
+          <MenuIcon setAuthModalState={setAuthModalState} />
+          <MenuIcon setAuthModalState={setAuthModalState} />
+        </div>
       </div>
     </div>
     

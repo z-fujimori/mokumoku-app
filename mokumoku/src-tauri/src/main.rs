@@ -49,6 +49,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             auth::check_auth,
             auth::login,
             auth::signup,
+            auth::logout,
             task::add_task, 
             task::get_tasks_info,
             task::grow_tree,

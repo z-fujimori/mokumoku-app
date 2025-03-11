@@ -1,5 +1,5 @@
 import React from "react";
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from '@tauri-apps/api/core'
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TextField, Button, Typography, Container } from "@mui/material";
@@ -9,7 +9,9 @@ import { z } from "zod";
 
 type LoginData = z.infer<typeof signupSchema>;
 
-const LoginForm: React.FC = () => {
+const LoginForm = (props:{
+    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
     const {
         control,
         handleSubmit,
@@ -21,6 +23,7 @@ const LoginForm: React.FC = () => {
     const onSubmit = async (input: LoginData) => {
         const { email, password } = input;
         const ret_token = await invoke<string>("login", {"email": email, "password": password})
+            .then(() => {props.setIsUpdateViewState(true)})
             .catch(err => {console.error(err); return "";});
         // const { data, error } = await supabase.auth.signInWithPassword({
         //     email,

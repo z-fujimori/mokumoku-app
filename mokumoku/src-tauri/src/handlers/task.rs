@@ -8,6 +8,8 @@ use crate::types::{PlaseWithTask, Position, StoreTask, Token};
 use reqwest::tls::Version;
 use futures::TryStreamExt;
 
+use super::auth;
+
 #[tauri::command]
 pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<Vec<PlaseWithTask>, String> {
     let query = "SELECT 
@@ -37,7 +39,6 @@ pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<V
     
         tasks.insert(plase_id, PlaseWithTask{plase_id, plase, tree_state_id, task_id, name, assignment, service, interval});
     }
-    println!("{:?}", tasks);
 
     Ok(tasks.into_iter().map(|(_k, v)| v).collect())
 }
@@ -46,16 +47,16 @@ pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<V
 pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, assignment: f64, service: String, interval: i64, plase: i64) -> Result<String, String> {
     println!("{name}, {assignment}, {service}, {interval}");
 
-    let row = sqlx::query("SELECT * FROM user_infos ORDER BY id DESC LIMIT 1")
-        .fetch_optional(&*sqlite_pool)
-        .await
-        .map_err(|e| e.to_string())?;
-
-    let token: String = row
-        .map(|row| Token {token: row.get("access_token"),})
-        .map(|token| token.token) // `Option<Token>` を `Option<String>` に変換
-        .unwrap_or("".to_string());
-
+    let token: String = auth::refresh(sqlite_pool.clone()).await.map_err(|e| format!("refreshエラー: {:?}", e))?;
+    // localDBからaccess_tokenを取得
+    // let row = sqlx::query("SELECT * FROM user_infos ORDER BY id DESC LIMIT 1")
+    //     .fetch_optional(&*sqlite_pool)
+    //     .await
+    //     .map_err(|e| e.to_string())?;
+    // let token: String = row
+    //     .map(|row| Token {token: row.get("access_token"),})
+    //     .map(|token| token.token) // `Option<Token>` を `Option<String>` に変換
+    //     .unwrap_or("".to_string());
     // println!("{:?}", token);
     println!("get token, {}", token);
 
