@@ -11,7 +11,7 @@ use tokio::time::{sleep, Duration as TokioDuration};
 use tauri::Emitter;
 
 use crate::database::data;
-use crate::handlers::{secure_session, auth, task};
+use crate::handlers::{secure_session, auth, task, schedule};
 use types::{User, LoginRequest, LoginResponse};
 
 // #[tokio::main]
@@ -53,27 +53,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             task::get_tasks_info,
             task::grow_tree,
             task::off_task,
+            schedule::midnight_event
         ])
-        // 多分これで関数の引数にsqlite_poolが入る
         .setup(|app| {
+            // 多分これで関数の引数にsqlite_poolが入る
             app.manage(sqlite_pool); 
+            
+            // // 定刻0時にイベント発生
+            // let app_handle = app.handle().clone();
+            // tauri::async_runtime::spawn(async move {
+            //     let database_url = "sqlite://my_database.sqlite";
+            //     let sqlite_pool = data::create_sqlite_pool(&database_url).await.expect("DB 作成失敗");
+            //     data::migrate_database(&sqlite_pool).await.expect("DB マイグレーション失敗");
+                
+            //     app_handle.manage(sqlite_pool);
+            // });
+
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    let now = Local::now().naive_local();
+                    let next_midnight = (now.date() + Days::new(1)).and_hms_opt(0, 0, 0).unwrap();
+                    let duration_until_midnight = (next_midnight - now).to_std().unwrap();
+                    println!("次のイベントまでの待機時間: {:?}", duration_until_midnight);
+                    sleep(TokioDuration::from_secs(duration_until_midnight.as_secs())).await;
+                    handle.emit("midnight_event", "毎日 0 時のイベント発生！").unwrap();
+                }
+            });
+
             Ok(())
         })
-        // // 定刻0時にイベント発生
-        // .setup(|app| {
-        //     let app_handle = app.handle().clone();
-
-        //     // ✅ `async_runtime::spawn` を使用
-        //     tauri::async_runtime::spawn(async move {
-        //         let database_url = "sqlite://my_database.sqlite";
-        //         let sqlite_pool = data::create_sqlite_pool(&database_url).await.expect("DB 作成失敗");
-        //         data::migrate_database(&sqlite_pool).await.expect("DB マイグレーション失敗");
-                
-        //         app_handle.manage(sqlite_pool);
-        //     });
-
-        //     Ok(())
-        // })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
