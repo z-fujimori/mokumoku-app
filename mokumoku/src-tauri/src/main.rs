@@ -14,8 +14,8 @@ use crate::database::data;
 use crate::handlers::{secure_session, auth, task};
 use types::{User, LoginRequest, LoginResponse};
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+// #[tokio::main]
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     // db作成
     use tauri::async_runtime::block_on;
     const DATABASE_FILE: &str = "db.sqlite";
@@ -59,22 +59,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             app.manage(sqlite_pool); 
             Ok(())
         })
-        // 定刻0時にイベント発生
-        .setup(|app| {
-            let app_handle = app.handle().clone();
+        // // 定刻0時にイベント発生
+        // .setup(|app| {
+        //     let app_handle = app.handle().clone();
 
-            // ✅ `async_runtime::spawn` を使用
-            tauri::async_runtime::spawn(async move {
-                let database_url = "sqlite://my_database.sqlite";
-                let sqlite_pool = data::create_sqlite_pool(&database_url).await.expect("DB 作成失敗");
-                data::migrate_database(&sqlite_pool).await.expect("DB マイグレーション失敗");
+        //     // ✅ `async_runtime::spawn` を使用
+        //     tauri::async_runtime::spawn(async move {
+        //         let database_url = "sqlite://my_database.sqlite";
+        //         let sqlite_pool = data::create_sqlite_pool(&database_url).await.expect("DB 作成失敗");
+        //         data::migrate_database(&sqlite_pool).await.expect("DB マイグレーション失敗");
                 
-                app_handle.manage(sqlite_pool);
-            });
+        //         app_handle.manage(sqlite_pool);
+        //     });
 
-            Ok(())
-        })
-
+        //     Ok(())
+        // })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
