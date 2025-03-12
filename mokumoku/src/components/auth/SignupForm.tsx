@@ -9,7 +9,9 @@ import { z } from "zod";
 
 type SignupData = z.infer<typeof signupSchema>;
 
-const SignupForm: React.FC = () => {
+const SignupForm = (props:{
+    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>
+}) => {
     const {
         control,
         handleSubmit,
@@ -21,6 +23,7 @@ const SignupForm: React.FC = () => {
     const onSubmit = async (input: SignupData) => {
         const { email, password } = input;
         const ret_token = await invoke<string>("signup", {"email": email, "password": password})
+            .then(() => {props.setIsUpdateViewState(true)})
             .catch(err => {console.error("失敗", err); return "";});
 
         console.log("トークン:", ret_token);

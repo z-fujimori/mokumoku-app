@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS user_infos (
     id INTEGER PRIMARY KEY,
-    token TEXT NOT NULL
+    access_token TEXT NOT NULL,
+    refresh_token TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY,
@@ -8,6 +9,13 @@ CREATE TABLE IF NOT EXISTS tasks (
     assignment REAL NOT NULL,
     service TEXT NOT NULL,
     interval INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS stamps (
+    id INTEGER PRIMARY KEY,
+    amount INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    task_id INTEGER NOT NULL,
+    FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS tree_states (
     id INTEGER PRIMARY KEY,
@@ -18,7 +26,7 @@ CREATE TABLE IF NOT EXISTS bords (
     plase TEXT NOT NULL,
     task_id INTEGER,
     tree_state_id INTEGER,
-    FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
+    FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE,
     FOREIGN KEY (tree_state_id) REFERENCES tree_states (id) ON DELETE CASCADE
 );
 
