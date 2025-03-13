@@ -3,10 +3,10 @@ use std::env;
 use dotenv::dotenv;
 use reqwest::{self, header::CONTENT_TYPE, Client};
 use reqwest::tls::Version;
-use tauri::{http::response, State};
+use tauri::{State};
 use sqlx::Row;
 use serde_json::json;
-use crate::types::{LoginRequest, LoginResponse, Token, User};
+use crate::types::{LoginRequest, LoginResponse, Token};
 
 #[tauri::command]
 pub async fn check_auth(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<bool, String> {

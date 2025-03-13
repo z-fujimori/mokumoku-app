@@ -1,10 +1,12 @@
+use core::task;
 use std::{collections::BTreeMap, env};
 
+use chrono::Local;
 use dotenv::dotenv;
 use tauri::State;
 use sqlx::Row;
 use reqwest::{self, header::CONTENT_TYPE, Client};
-use crate::types::{PlaseWithTask, Position, StoreTask, Token};
+use crate::types::{PlaseWithTask, Position, StoreTask};
 use reqwest::tls::Version;
 use futures::TryStreamExt;
 
@@ -20,7 +22,9 @@ pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<V
         tasks.name AS name,
         tasks.assignment AS assignment,
         tasks.service AS service,
-        tasks.interval AS interval 
+        tasks.interval AS interval,
+        tasks.consecutive_record AS consecutive_record,
+        tasks.record_high AS record_high
         FROM bords LEFT JOIN tasks ON bords.task_id = tasks.id";
     let mut rows = sqlx::query(&query)
         .fetch(&*sqlite_pool);
@@ -36,9 +40,13 @@ pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<V
         let assignment: f64 = row.try_get("assignment").map_err(|e| e.to_string())?;
         let service: String = row.try_get("service").map_err(|e| e.to_string())?;
         let interval: i64 = row.try_get("interval").map_err(|e| e.to_string())?;
+        let consecutive_record: i64 = row.try_get("consecutive_record").map_err(|e| e.to_string())?;
+        let record_high: i64 = row.try_get("record_high").map_err(|e| e.to_string())?;
     
-        tasks.insert(plase_id, PlaseWithTask{plase_id, plase, tree_state_id, task_id, name, assignment, service, interval});
+        tasks.insert(plase_id, PlaseWithTask{plase_id, plase, tree_state_id, task_id, name, assignment, service, interval, consecutive_record, record_high});
     }
+
+    println!("{:?}",tasks);
 
     Ok(tasks.into_iter().map(|(_k, v)| v).collect())
 }
@@ -119,9 +127,41 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
     Ok("ok".to_string())
 }
 
+pub async fn get_taskid_from_bord(sqlite_pool: State<'_, sqlx::SqlitePool>, bord_id: i64) ->Result<i32, String> {
+    let row = sqlx::query("SELECT task_id FROM bords WHERE id = ?")
+        .bind(bord_id)
+        // .fetch_one(sqlite_pool)
+        .fetch_optional(&*sqlite_pool)
+        .await
+        .map_err(|e| e.to_string())?;
+    let task_id: i32 = row.expect("can't get id").try_get("task_id").map_err(|e| e.to_string())?;
+    Ok(task_id)
+}
+
+#[tauri::command]
+pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, treeState: i64) ->Result<String, String> {
+    let now = Local::now(); // 現在のローカル時刻を取得
+    let now_date = now.format("%Y-%m-%d %H:%M:%S").to_string(); // フォーマット
+    let task_id = get_taskid_from_bord(sqlite_pool.clone(), bordId).await.map_err(|e| format!("stamp_taskでtask_id取得失敗: {:?}", e))?;
+
+    let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
+    sqlx::query("INSERT INTO stamps (amount, date, task_id) VALUES (?, ?, ?)")
+        .bind(0.5)
+        .bind(now_date)
+        .bind(task_id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| e.to_string())?;
+    tx.commit().await.map_err(|e| e.to_string())?;
+
+    let _ = grow_tree(sqlite_pool, bordId, treeState).await.map_err(|e| format!("store_task request error: {:?}", e))?;
+
+    Ok("ok".to_string())
+}
+
 #[tauri::command]
 pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, treeState: i64) ->Result<String, String> {
-    let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
+    let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;    
     sqlx::query("UPDATE bords SET tree_state_id = ? WHERE id = ?")
         .bind((treeState+1)%5 + (treeState+1)/5)
         .bind(bordId)

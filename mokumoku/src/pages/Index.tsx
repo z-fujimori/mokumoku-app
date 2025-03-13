@@ -30,7 +30,7 @@ const Index = (props:{
   }
 
   async function handleButton() {
-    await invoke<any>("get_tasks_info").then((res) => console.log(res)).catch((err) => console.error(err));
+    await invoke<any>("schedule_event").then((res) => console.log(res)).catch((err) => console.error(err));
   }
 
   // useEffect(() => {

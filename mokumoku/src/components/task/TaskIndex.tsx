@@ -14,7 +14,7 @@ const TaskIndex = (props:{
 }) => {
 
     async function taskCompleted() {
-        await invoke<string>("grow_tree", {bordId: props.modalState, treeState: props.itemsState.tree_state_id})
+        await invoke<string>("stamp_task", {bordId: props.modalState, treeState: props.itemsState.tree_state_id})
             .then((res) => console.log(res)).catch((err) => console.error(err));
         
         // let newState = [...props.itemsState];

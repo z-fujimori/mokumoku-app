@@ -14,5 +14,7 @@ export type PlaseWithTask = {
     name: string,
     assignment: number,
     service: string,
-    interval: number
+    interval: number,
+    consecutive_record: number,
+    record_high: number
 }
