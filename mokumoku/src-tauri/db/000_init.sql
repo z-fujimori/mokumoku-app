@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     assignment REAL NOT NULL,
     service TEXT NOT NULL,
     interval INTEGER NOT NULL,
+    limit_time INTEGER NOT NULL,
     consecutive_record INTEGER NOT NULL  DEFAULT 0,
     record_high INTEGER NOT NULL DEFAULT 0
 );

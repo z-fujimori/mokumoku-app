@@ -1,6 +1,4 @@
-use core::task;
 use std::{collections::BTreeMap, env};
-
 use chrono::Local;
 use dotenv::dotenv;
 use tauri::State;
@@ -9,7 +7,6 @@ use reqwest::{self, header::CONTENT_TYPE, Client};
 use crate::types::{PlaseWithTask, Position, StoreTask};
 use reqwest::tls::Version;
 use futures::TryStreamExt;
-
 use super::auth;
 
 #[tauri::command]
@@ -24,7 +21,8 @@ pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<V
         tasks.service AS service,
         tasks.interval AS interval,
         tasks.consecutive_record AS consecutive_record,
-        tasks.record_high AS record_high
+        tasks.record_high AS record_high,
+        tasks.limit_time AS limit_time
         FROM bords LEFT JOIN tasks ON bords.task_id = tasks.id";
     let mut rows = sqlx::query(&query)
         .fetch(&*sqlite_pool);
@@ -40,10 +38,11 @@ pub async fn get_tasks_info(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<V
         let assignment: f64 = row.try_get("assignment").map_err(|e| e.to_string())?;
         let service: String = row.try_get("service").map_err(|e| e.to_string())?;
         let interval: i64 = row.try_get("interval").map_err(|e| e.to_string())?;
+        let limit_time: i64 = row.try_get("limit_time").map_err(|e| e.to_string())?;
         let consecutive_record: i64 = row.try_get("consecutive_record").map_err(|e| e.to_string())?;
         let record_high: i64 = row.try_get("record_high").map_err(|e| e.to_string())?;
     
-        tasks.insert(plase_id, PlaseWithTask{plase_id, plase, tree_state_id, task_id, name, assignment, service, interval, consecutive_record, record_high});
+        tasks.insert(plase_id, PlaseWithTask{plase_id, plase, tree_state_id, task_id, name, assignment, service, interval, limit_time, consecutive_record, record_high});
     }
 
     println!("{:?}",tasks);
@@ -106,10 +105,11 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
 
     // localに保存
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
-    let local_task = sqlx::query("INSERT INTO tasks (name, assignment, service, interval) VALUES (?, ?, ?, ?) RETURNING id")
+    let local_task = sqlx::query("INSERT INTO tasks (name, assignment, service, interval, limit_time) VALUES (?, ?, ?, ?, ?) RETURNING id")
         .bind(name)
         .bind(assignment)
         .bind(service)
+        .bind(interval)
         .bind(interval)
         .execute(&mut *tx)
         .await

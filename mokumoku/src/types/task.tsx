@@ -15,6 +15,14 @@ export type PlaseWithTask = {
     assignment: number,
     service: string,
     interval: number,
+    limit_time: number,
     consecutive_record: number,
     record_high: number
 }
+
+export const Service: Record<string, string> = {
+    "h": "時間",
+    "p": "ページ",
+    "ｺ": "個",
+    "-": "",
+};

@@ -9,7 +9,6 @@ use directories::ProjectDirs;
 use tauri::Manager;
 use tokio::time::{sleep, Duration as TokioDuration};
 use tauri::Emitter;
-use std::time::Duration as StdDuration;
 
 use crate::database::data;
 use crate::handlers::{auth, task, schedule};
@@ -71,7 +70,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     // sleep(StdDuration::from_secs(60)).await;  // デバック用 60sに一回
                     sleep(TokioDuration::from_secs(duration_until_midnight.as_secs())).await;  // 本番 次の日の0時
                     let state_pool: tauri::State<'_, sqlx::SqlitePool> = handle.state::<sqlx::SqlitePool>();
-                    schedule::schedule_event_dayend(state_pool).await.map_err(|e| format!("error: {:?}", e));
+                    let _ = schedule::schedule_event_dayend(state_pool).await.map_err(|e| format!("error: {:?}", e));
                     match handle.emit("schedule_event", "毎日 0 時のイベント発生！") {
                         Ok(_) => println!("schedule_event が送信"),
                         Err(e) => println!("emit() に失敗: {:?}", e),

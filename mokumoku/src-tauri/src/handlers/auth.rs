@@ -1,5 +1,4 @@
 use std::env;
-
 use dotenv::dotenv;
 use reqwest::{self, header::CONTENT_TYPE, Client};
 use reqwest::tls::Version;
