@@ -11,7 +11,7 @@ const MenuIcon = (props:{
     }
 
     return (
-        <button className='bg-[#e2d6c4] bg-opacity-30 h-[80px] w-[80px] rounded-lg mx-[5px]' onClick={openComponent}>
+        <button className='bg-[#e2d6c4] bg-opacity-30 hover:bg-opacity-20 h-[80px] w-[80px] rounded-lg mx-[5px]' onClick={openComponent}>
             <FiUser className='h-full w-full p-3 text-slate-700' />
         </button>
     )

@@ -103,3 +103,16 @@ async fn reset_tree(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, 
 fn die_tree(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
     Ok("ok".to_string())
 }
+
+pub async fn total_stamp(sqlite_pool: State<'_, sqlx::SqlitePool>, task_id: i32, date: String) -> Result<f64, String> {
+    let row = sqlx::query("SELECT SUM(amount) AS total_amount FROM stamps WHERE task_id = ? AND DATE(date) = DATE(?)")
+        .bind(task_id)
+        .bind(date)
+        .fetch_optional(&*sqlite_pool)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let amount: f64 = row.map(|r| r.try_get::<f64, _>("total_amount").unwrap_or(0.0)).unwrap_or(0.0);
+
+    Ok(amount)
+}
