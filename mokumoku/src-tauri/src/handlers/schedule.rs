@@ -76,7 +76,7 @@ pub async fn schedule_event_dayend(sqlite_pool: State<'_, sqlx::SqlitePool>) -> 
 pub async fn yesterday_total_stamp(sqlite_pool: State<'_, sqlx::SqlitePool>, task_id: i32) -> Result<f64, String> {
     let today = Local::now().date_naive(); // 現在の日付（NaiveDate）
     let yesterday = today - Duration::days(1); // 1日前の日付を計算
-    let formatday = today.format("%Y-%m-%d").to_string(); // フォーマット
+    let formatday = yesterday.format("%Y-%m-%d").to_string(); // フォーマット
     // let formatday = yesterday.format("%Y-%m-%d").to_string(); // フォーマット
     // let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
     let row = sqlx::query("SELECT SUM(amount) AS total_amount FROM stamps WHERE task_id = ? AND DATE(date) = DATE(?)")

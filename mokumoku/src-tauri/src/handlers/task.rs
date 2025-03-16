@@ -155,7 +155,32 @@ pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, t
         .map_err(|e| e.to_string())?;
     tx.commit().await.map_err(|e| e.to_string())?;
 
-    let _ = grow_tree(sqlite_pool, bordId, treeState).await.map_err(|e| format!("store_task request error: {:?}", e))?;
+    let today = Local::now().date_naive(); // 現在の日付（NaiveDate）
+    let formatday = today.format("%Y-%m-%d").to_string(); // フォーマット
+    let query = "SELECT 
+        SUM(s.amount) AS total_amount, t.assignment AS assignment
+        FROM stamps s
+        JOIN bords b ON s.task_id = b.task_id
+        JOIN tasks t ON s.task_id = t.id
+        WHERE b.id = ?
+        AND DATE(s.date) = DATE(?)";
+    let row = sqlx::query(query)
+        .bind(bordId)
+        .bind(formatday)
+        .fetch_optional(&*sqlite_pool)
+        .await
+        .map_err(|e| e.to_string())?;
+    let amount_data = row.map(|r| {
+            (
+                r.try_get::<f64, _>("total_amount").unwrap_or(0.0), 
+                r.try_get::<f64, _>("assignment").unwrap_or(0.0)
+            )
+        }).unwrap_or_else(|| (0.0, 0.0));
+    println!("{} {}", amount_data.0, amount_data.1);
+    if amount_data.0 >= amount_data.1 {
+        let _ = grow_tree(sqlite_pool, bordId, treeState).await.map_err(|e| format!("store_task request error: {:?}", e))?;
+    }
+
 
     Ok("ok".to_string())
 }
