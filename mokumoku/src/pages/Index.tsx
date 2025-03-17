@@ -67,7 +67,7 @@ const Index = (props:{
         </div>
 
         <div className='h-1/5 '>
-          <button onClick={handleButton}>button</button>
+          {/* <button onClick={handleButton}>button</button> */}
         </div>
       </div>
 

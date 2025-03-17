@@ -1,3 +1,4 @@
+use core::task;
 use std::{collections::BTreeMap, env};
 use chrono::Local;
 use dotenv::dotenv;
@@ -145,6 +146,33 @@ pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, t
     let now_date = now.format("%Y-%m-%d %H:%M:%S").to_string(); // フォーマット
     let task_id = get_taskid_from_bord(sqlite_pool.clone(), bordId).await.map_err(|e| format!("stamp_taskでtask_id取得失敗: {:?}", e))?;
 
+    // 既にノルマクリアしているか
+    let today = Local::now().date_naive(); // 現在の日付（NaiveDate）
+    let formatday = today.format("%Y-%m-%d").to_string(); // フォーマット
+    let query = "SELECT 
+        SUM(s.amount) AS total_amount, t.assignment AS assignment, s.id AS task_id, s.consecutive_record AS consecutive_record
+        FROM stamps s
+        JOIN bords b ON s.task_id = b.task_id
+        JOIN tasks t ON s.task_id = t.id
+        WHERE b.id = ?
+        AND DATE(s.date) = DATE(?)";
+    let row = sqlx::query(query)
+        .bind(bordId)
+        .bind(formatday.clone())
+        .fetch_optional(&*sqlite_pool)
+        .await
+        .map_err(|e| e.to_string())?;
+    let past_amount_data = row.map(|r| {
+            (
+                r.try_get::<f64, _>("total_amount").unwrap_or(0.0), 
+                r.try_get::<f64, _>("assignment").unwrap_or(0.0),
+                r.try_get::<i64, _>("task_id").unwrap_or(0),
+                r.try_get::<i64, _>("consecutive_record").unwrap_or(0)
+            )
+        }).unwrap_or_else(|| (0.0, 0.0, 0, 0));
+    let already_task_clear = past_amount_data.0 >= past_amount_data.1;
+
+    // タスク登録
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
     sqlx::query("INSERT INTO stamps (amount, date, task_id) VALUES (?, ?, ?)")
         .bind(amount)
@@ -155,42 +183,44 @@ pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, t
         .map_err(|e| e.to_string())?;
     tx.commit().await.map_err(|e| e.to_string())?;
 
-    let today = Local::now().date_naive(); // 現在の日付（NaiveDate）
-    let formatday = today.format("%Y-%m-%d").to_string(); // フォーマット
-    let query = "SELECT 
-        SUM(s.amount) AS total_amount, t.assignment AS assignment
-        FROM stamps s
-        JOIN bords b ON s.task_id = b.task_id
-        JOIN tasks t ON s.task_id = t.id
-        WHERE b.id = ?
-        AND DATE(s.date) = DATE(?)";
-    let row = sqlx::query(query)
-        .bind(bordId)
-        .bind(formatday)
-        .fetch_optional(&*sqlite_pool)
-        .await
-        .map_err(|e| e.to_string())?;
-    let amount_data = row.map(|r| {
-            (
-                r.try_get::<f64, _>("total_amount").unwrap_or(0.0), 
-                r.try_get::<f64, _>("assignment").unwrap_or(0.0)
-            )
-        }).unwrap_or_else(|| (0.0, 0.0));
-    println!("{} {}", amount_data.0, amount_data.1);
-    if amount_data.0 >= amount_data.1 {
-        let _ = grow_tree(sqlite_pool, bordId, treeState).await.map_err(|e| format!("store_task request error: {:?}", e))?;
+    if !already_task_clear {
+        // ノルマクリアしたか
+        let row = sqlx::query(query)
+            .bind(bordId)
+            .bind(formatday)
+            .fetch_optional(&*sqlite_pool)
+            .await
+            .map_err(|e| e.to_string())?;
+        let amount_data = row.map(|r| {
+                (
+                    r.try_get::<f64, _>("total_amount").unwrap_or(0.0), 
+                    r.try_get::<f64, _>("assignment").unwrap_or(0.0),
+                    r.try_get::<i64, _>("task_id").unwrap_or(0),
+                    r.try_get::<i64, _>("consecutive_record").unwrap_or(0)
+                )
+            }).unwrap_or_else(|| (0.0, 0.0, 0, 0));
+        println!("{} {}", amount_data.0, amount_data.1);
+    
+        if amount_data.0 >= amount_data.1 {
+            let _ = grow_tree(sqlite_pool, bordId, treeState, amount_data.2, amount_data.3).await.map_err(|e| format!("store_task request error: {:?}", e))?;
+        }
     }
-
 
     Ok("ok".to_string())
 }
 
 #[tauri::command]
-pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, treeState: i64) ->Result<String, String> {
+pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, treeState: i64, taskId: i64, consecutive_record: i64) ->Result<String, String> {
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;    
     sqlx::query("UPDATE bords SET tree_state_id = ? WHERE id = ?")
         .bind((treeState+1)%5 + (treeState+1)/5)
         .bind(bordId)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| e.to_string())?;
+    sqlx::query("UPDATE tasks SET consecutive_record = ? WHERE id = ?")
+        .bind(consecutive_record + 1)
+        .bind(taskId)
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;

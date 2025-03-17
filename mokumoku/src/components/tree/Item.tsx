@@ -26,18 +26,24 @@ const Item = (props:{
     }
 
     return (
-        <>
-        <button onClick={()=>{clickItem()}}>
-            <div className='p-10 w-56 flex justify-center items-center'>
-                {props.treeState == TreeState.none && <Plus />}
-                {props.treeState == TreeState.seed && <Seed />}
-                {props.treeState == TreeState.sprout && <Sprout />}
-                {props.treeState == TreeState.tree && <Tree />}
-                {props.treeState == TreeState.nut && <Nut />}
-                {props.treeState == TreeState.dead && <Dead />}
+        <div>
+            <div>
+                <h2>{props.itemsState?.[props.itemNum]?.name ?? "データがありません"}</h2>
             </div>
-        </button>
-        </>
+            <button onClick={()=>{clickItem()}}>
+                <div className='p-10 w-56 flex justify-center items-center'>
+                    {props.treeState == TreeState.none && <Plus />}
+                    {props.treeState == TreeState.seed && <Seed />}
+                    {props.treeState == TreeState.sprout && <Sprout />}
+                    {props.treeState == TreeState.tree && <Tree />}
+                    {props.treeState == TreeState.nut && <Nut />}
+                    {props.treeState == TreeState.dead && <Dead />}
+                </div>
+            </button>
+            <div>
+                <h2>{props.itemsState?.[props.itemNum]?.consecutive_record ?? "データがありません"}</h2>
+            </div>
+        </div>
     )
 }
 
