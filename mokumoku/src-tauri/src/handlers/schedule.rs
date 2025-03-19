@@ -5,7 +5,7 @@ use super::task::get_tasks_info;
 
 #[tauri::command]
 pub async fn schedule_event_dayend(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
-    println!("定期イベント");
+    println!("schedule_event_dayend");
 
     let today = Local::now().date_naive(); // 現在の日付（NaiveDate）
     let yesterday = today - Duration::days(1); // 1日前の日付を計算
@@ -19,6 +19,7 @@ pub async fn schedule_event_dayend(sqlite_pool: State<'_, sqlx::SqlitePool>) -> 
         let amount = yesterday_total_stamp(sqlite_pool.clone(), task.task_id).await.map_err(|e| format!("昨日のamount取得時: {:?}", e))?;
         // 実っている木をリセット else 木を枯れさせる
         if task.limit_time <= 1 {
+            println!("定期イベント");
             if amount >= task.assignment && task.tree_state_id == 4 {
                 println!("{}: 実を回収", task.plase);
                 let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;

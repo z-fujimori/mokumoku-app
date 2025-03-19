@@ -67,7 +67,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let next_midnight = (now.date() + Days::new(1)).and_hms_opt(0, 0, 10).unwrap();
                     let duration_until_midnight = (next_midnight - now).to_std().unwrap();
                     println!("次のイベントまでの待機時間: {:?}", duration_until_midnight);
-                    // sleep(StdDuration::from_secs(60)).await;  // デバック用 60sに一回
+                    // sleep(TokioDuration::from_secs(60)).await;  // デバック用 60sに一回
                     sleep(TokioDuration::from_secs(duration_until_midnight.as_secs())).await;  // 本番 次の日の0時
                     let state_pool: tauri::State<'_, sqlx::SqlitePool> = handle.state::<sqlx::SqlitePool>();
                     let _ = schedule::schedule_event_dayend(state_pool).await.map_err(|e| format!("error: {:?}", e));

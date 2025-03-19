@@ -150,7 +150,7 @@ pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, t
     let today = Local::now().date_naive(); // 現在の日付（NaiveDate）
     let formatday = today.format("%Y-%m-%d").to_string(); // フォーマット
     let query = "SELECT 
-        SUM(s.amount) AS total_amount, t.assignment AS assignment, s.id AS task_id, s.consecutive_record AS consecutive_record
+        SUM(s.amount) AS total_amount, t.assignment AS assignment, s.task_id AS task_id, t.consecutive_record AS consecutive_record
         FROM stamps s
         JOIN bords b ON s.task_id = b.task_id
         JOIN tasks t ON s.task_id = t.id
@@ -170,7 +170,14 @@ pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, t
                 r.try_get::<i64, _>("consecutive_record").unwrap_or(0)
             )
         }).unwrap_or_else(|| (0.0, 0.0, 0, 0));
-    let already_task_clear = past_amount_data.0 >= past_amount_data.1;
+    let already_task_clear = (
+        if past_amount_data.0 == 0.0 && past_amount_data.1 == 0.0 {
+            false
+        } else {
+            past_amount_data.0 >= past_amount_data.1
+        }
+    );
+    println!("{} total:{} assi:{}", already_task_clear, past_amount_data.0, past_amount_data.1);
 
     // タスク登録
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
@@ -199,7 +206,7 @@ pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, t
                     r.try_get::<i64, _>("consecutive_record").unwrap_or(0)
                 )
             }).unwrap_or_else(|| (0.0, 0.0, 0, 0));
-        println!("{} {}", amount_data.0, amount_data.1);
+        println!("これ {} {}", amount_data.0, amount_data.1);
     
         if amount_data.0 >= amount_data.1 {
             let _ = grow_tree(sqlite_pool, bordId, treeState, amount_data.2, amount_data.3).await.map_err(|e| format!("store_task request error: {:?}", e))?;
@@ -218,7 +225,7 @@ pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, tr
         .execute(&mut *tx)
         .await
         .map_err(|e| e.to_string())?;
-    sqlx::query("UPDATE tasks SET consecutive_record = ? WHERE id = ?")
+    let a = sqlx::query("UPDATE tasks SET consecutive_record = ? WHERE id = ?")
         .bind(consecutive_record + 1)
         .bind(taskId)
         .execute(&mut *tx)
@@ -226,6 +233,7 @@ pub async fn grow_tree(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, tr
         .map_err(|e| e.to_string())?;
     tx.commit().await.map_err(|e| e.to_string())?;
 
+    println!("aa {:?},, {} id:{}", a, consecutive_record+1, taskId);
     Ok("ok".to_string())
 }
 

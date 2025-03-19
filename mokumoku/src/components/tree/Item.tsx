@@ -28,7 +28,7 @@ const Item = (props:{
     return (
         <div>
             <div>
-                <h2>{props.itemsState?.[props.itemNum]?.name ?? "データがありません"}</h2>
+                <h2>{props.itemsState?.[props.itemNum - 1]?.name ?? "データがありません"}</h2>
             </div>
             <button onClick={()=>{clickItem()}}>
                 <div className='p-10 w-56 flex justify-center items-center'>
@@ -41,7 +41,7 @@ const Item = (props:{
                 </div>
             </button>
             <div>
-                <h2>{props.itemsState?.[props.itemNum]?.consecutive_record ?? "データがありません"}</h2>
+                <h2>{props.itemsState?.[props.itemNum - 1]?.consecutive_record ?? "データがありません"}</h2>
             </div>
         </div>
     )

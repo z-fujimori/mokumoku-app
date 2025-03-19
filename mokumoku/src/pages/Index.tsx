@@ -33,6 +33,8 @@ const Index = (props:{
     await invoke<any>("schedule_event").then((res) => console.log(res)).catch((err) => console.error(err));
   }
 
+  console.log("ボードインフォ: ", props.bordInfo);
+
   // useEffect(() => {
   //   (async () => {
   //     const tasks = await invoke<PlaseWithTask[]>("get_tasks_info", {})
