@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS user_infos (
     id INTEGER PRIMARY KEY,
     access_token TEXT NOT NULL,
-    refresh_token TEXT NOT NULL
+    refresh_token TEXT NOT NULL,
+    last_sckedule_ivent TEXT
 );
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY,

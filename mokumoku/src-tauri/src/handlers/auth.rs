@@ -24,6 +24,7 @@ pub async fn check_auth(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<bool
 
 #[tauri::command]
 pub async fn login(sqlite_pool: State<'_, sqlx::SqlitePool>, email: &str, password: &str) -> Result<bool, String> {
+    println!("login");
     dotenv().ok();
     let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
     let client = Client::builder()

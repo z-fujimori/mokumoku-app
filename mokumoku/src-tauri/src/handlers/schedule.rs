@@ -6,11 +6,20 @@ use super::task::get_tasks_info;
 #[tauri::command]
 pub async fn schedule_event_dayend(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
     println!("schedule_event_dayend");
-
+    
     let today = Local::now().date_naive(); // 現在の日付（NaiveDate）
     let yesterday = today - Duration::days(1); // 1日前の日付を計算
     let formatday = yesterday.format("%Y-%m-%d").to_string(); // フォーマット
     println!("{}",formatday);
+
+    // 日時を更新
+    // let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
+    // sqlx::query("UPDATE user_infos SET last_sckedule_ivent = ? WHERE id = 1")
+    //     .bind(formatday)
+    //     .execute(&mut *tx)
+    //     .await
+    //     .map_err(|e| e.to_string())?;
+    // tx.commit().await.map_err(|e| e.to_string())?;
 
     let data = get_tasks_info(sqlite_pool.clone()).await.map_err(|e| format!("errorr!: {:?}", e))?;
     println!("{:?}",data);

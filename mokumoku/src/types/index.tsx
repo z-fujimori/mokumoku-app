@@ -3,3 +3,8 @@ export enum ViewState {
     "auth",
     "index"
 }
+
+export enum MainPageState {
+    "index",
+    "archive"
+}

@@ -6,11 +6,14 @@ import { TextField, Button, Typography, Container } from "@mui/material";
 import { supabase } from "../../lib/supabaseClient";
 import { signupSchema } from "../../lib/authSchema";
 import { z } from "zod";
+import { ViewState } from "../../types";
 
 type SignupData = z.infer<typeof signupSchema>;
 
 const SignupForm = (props:{
-    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>
+    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>,
+    setPageState: React.Dispatch<React.SetStateAction<number>>,
+    setViewState: React.Dispatch<React.SetStateAction<ViewState>>
 }) => {
     const {
         control,
@@ -21,10 +24,18 @@ const SignupForm = (props:{
     });
 
     const onSubmit = async (input: SignupData) => {
+        // props.setViewState(ViewState.load)  // サインイン画面からロードを入れたかったが無理そうか？
         const { email, password } = input;
         const ret_token = await invoke<string>("signup", {"email": email, "password": password})
-            .then(() => {props.setIsUpdateViewState(true)})
-            .catch(err => {console.error("失敗", err); return "";});
+            .then(() => {
+                props.setIsUpdateViewState(true);
+                // props.setViewState(ViewState.index);  // サインイン画面からロードを入れたかったが無理そうか？
+            })
+            .catch(err => {
+                console.error("失敗", err);
+                // props.setViewState(ViewState.auth);  // サインイン画面からロードを入れたかったが無理そうか？
+                return "";
+            });
 
         console.log("トークン:", ret_token);
         alert("サインアップに成功しました！");
@@ -73,6 +84,11 @@ const SignupForm = (props:{
                     登録
                 </Button>
             </form>
+            <div className="w-auto flex justify-end">
+                <button
+                    className="text-sm font-light hover:font-medium m-2" 
+                    onClick={()=>{props.setPageState(0)}}>ログインはこちら</button>
+            </div>
         </Container>
     );
 };

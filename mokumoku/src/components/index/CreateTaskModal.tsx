@@ -36,7 +36,6 @@ const CreateTaskModal = (props:{
                             type="text"
                             {...register("name", { required: "タスク名を入力しよう！" })}
                             placeholder="何をやる？"
-                            value={"理論と実装"}
                             // onChange={}
                             className="w-5/6 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             required
@@ -49,7 +48,6 @@ const CreateTaskModal = (props:{
                             {...register("assignment", { required: "ノルマを設定しよう！", valueAsNumber: true })}
                             name="assignment"
                             placeholder="どのくらいやる？"
-                            value={1}
                             // onChange={}
                             className="w-2/3 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             required
@@ -74,7 +72,6 @@ const CreateTaskModal = (props:{
                             {...register("interval", { required: "頻度を設定しよう！", valueAsNumber: true })}
                             name="interval"
                             placeholder="何日ごとやる？(ex.1日)"
-                            value={1}
                             // onChange={}
                             className="w-2/3 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             required

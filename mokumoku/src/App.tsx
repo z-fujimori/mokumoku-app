@@ -7,6 +7,7 @@ import { PlaseWithTask } from "./types/task";
 import Load from "./pages/Load";
 import { ViewState } from "./types";
 import { listen } from "@tauri-apps/api/event";
+import Main from "./pages/Main";
 
 function App() {
   const [bordInfo, setBordInfo] = useState<PlaseWithTask[]>([]);
@@ -68,8 +69,8 @@ function App() {
   return (
     <main className="container">
       {viewState === ViewState.load && <Load /> }
-      {viewState === ViewState.auth && <Auth setIsUpdateViewState={setIsUpdateViewState} /> }
-      {viewState === ViewState.index && <Index bordInfo={bordInfo} setChangeBordInfo={setChangeBordInfo} setIsUpdateViewState={setIsUpdateViewState} /> }
+      {viewState === ViewState.auth && <Auth setIsUpdateViewState={setIsUpdateViewState} setViewState={setViewState} /> }
+      {viewState === ViewState.index && <Main bordInfo={bordInfo} setChangeBordInfo={setChangeBordInfo} setIsUpdateViewState={setIsUpdateViewState} /> }
     </main>
   );
 }

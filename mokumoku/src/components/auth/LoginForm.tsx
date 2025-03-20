@@ -6,11 +6,14 @@ import { TextField, Button, Typography, Container } from "@mui/material";
 import { supabase } from "../../lib/supabaseClient";
 import { signupSchema } from "../../lib/authSchema";
 import { z } from "zod";
+import { ViewState } from "../../types";
 
 type LoginData = z.infer<typeof signupSchema>;
 
 const LoginForm = (props:{
-    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>
+    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>,
+    setPageState: React.Dispatch<React.SetStateAction<number>>,
+    setViewState: React.Dispatch<React.SetStateAction<ViewState>>
 }) => {
     const {
         control,
@@ -21,19 +24,17 @@ const LoginForm = (props:{
     });
 
     const onSubmit = async (input: LoginData) => {
+        // props.setViewState(ViewState.load)  // ログイン画面からロードを入れたかったが無理そうか？
         const { email, password } = input;
         const ret_token = await invoke<string>("login", {"email": email, "password": password})
-            .then(() => {props.setIsUpdateViewState(true)})
-            .catch(err => {console.error(err); return "";});
-        // const { data, error } = await supabase.auth.signInWithPassword({
-        //     email,
-        //     password,
-        // });
-
-        // if (error) {
-        //     console.error("ログインエラー:", error.message);
-        //     return;
-        // }
+            .then(() => {
+                props.setIsUpdateViewState(true);
+                // props.setViewState(ViewState.index);  // ログイン画面からロードを入れたかったが無理そうか？
+            })
+            .catch(err => {
+                console.error(err); return "";
+                // props.setViewState(ViewState.auth)  // ログイン画面からロードを入れたかったが無理そうか？
+            });
 
         console.log("ログイン成功:", ret_token);
         alert("ログインに成功しました！");
@@ -82,6 +83,11 @@ const LoginForm = (props:{
                     ログイン
                 </Button>
             </form>
+            <div className="w-auto flex justify-end">
+                <button
+                    className="text-sm font-light hover:font-medium m-2" 
+                    onClick={()=>{props.setPageState(1)}}>サインインはこちら</button>
+            </div>
         </Container>
     );
 };
