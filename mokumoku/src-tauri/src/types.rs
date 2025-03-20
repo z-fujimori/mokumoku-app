@@ -42,7 +42,10 @@ pub struct PlaseWithTask {
     pub name: String,
     pub assignment: f64,
     pub service: String,
-    pub interval: i64
+    pub interval: i64,
+    pub limit_time: i64,
+    pub consecutive_record: i64,
+    pub record_high: i64
 }
 
 

@@ -1,12 +1,11 @@
 use std::env;
-
 use dotenv::dotenv;
 use reqwest::{self, header::CONTENT_TYPE, Client};
 use reqwest::tls::Version;
-use tauri::{http::response, State};
+use tauri::{State};
 use sqlx::Row;
 use serde_json::json;
-use crate::types::{LoginRequest, LoginResponse, Token, User};
+use crate::types::{LoginRequest, LoginResponse, Token};
 
 #[tauri::command]
 pub async fn check_auth(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<bool, String> {
@@ -25,6 +24,7 @@ pub async fn check_auth(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<bool
 
 #[tauri::command]
 pub async fn login(sqlite_pool: State<'_, sqlx::SqlitePool>, email: &str, password: &str) -> Result<bool, String> {
+    println!("login");
     dotenv().ok();
     let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
     let client = Client::builder()

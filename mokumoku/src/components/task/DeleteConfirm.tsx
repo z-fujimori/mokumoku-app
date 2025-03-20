@@ -15,11 +15,15 @@ const DeleteConfirm = (props:{
     }
 
     return (
-        <div>
-            DeleteConfirm
-            <div className='flex justify-between items-center'>
-                <button onClick={()=>{props.setDeleteConfirmState(false)}}>やめる</button>
-                <button onClick={offTaskButton}>消す</button>
+        <div className='pt-3'>
+            <h3 className="p-10 text-lg font-semibold text-gray-800">このタスクを削除しますか？</h3>
+            <div className='flex justify-between items-center px-16'>
+                <button
+                    className="px-4 py-2 w-24 text-gray-600 bg-gray-200 rounded hover:bg-gray-300 transition"
+                    onClick={()=>{props.setDeleteConfirmState(false)}}>やめる</button>
+                <button
+                    className="px-4 py-2 w-24 text-white bg-red-500 rounded hover:bg-red-600 transition"
+                    onClick={offTaskButton}> 消す </button>
             </div>
         </div>
     )

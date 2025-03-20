@@ -26,18 +26,30 @@ const Item = (props:{
     }
 
     return (
-        <>
-        <button onClick={()=>{clickItem()}}>
-            <div className='p-10 w-56 flex justify-center items-center'>
-                {props.treeState == TreeState.none && <Plus />}
-                {props.treeState == TreeState.seed && <Seed />}
-                {props.treeState == TreeState.sprout && <Sprout />}
-                {props.treeState == TreeState.tree && <Tree />}
-                {props.treeState == TreeState.nut && <Nut />}
-                {props.treeState == TreeState.dead && <Dead />}
-            </div>
-        </button>
-        </>
+        <div>
+            {props.itemsState?.[props.itemNum - 1]?.task_id ?
+                <div>
+                    <h2>{props.itemsState?.[props.itemNum - 1]?.name ?? "データがありません"}</h2>
+                </div>
+            : <></> }
+
+            <button onClick={()=>{clickItem()}}>
+                <div className='p-10 w-56 flex justify-center items-center'>
+                    {props.treeState == TreeState.none && <Plus />}
+                    {props.treeState == TreeState.seed && <Seed />}
+                    {props.treeState == TreeState.sprout && <Sprout />}
+                    {props.treeState == TreeState.tree && <Tree />}
+                    {props.treeState == TreeState.nut && <Nut />}
+                    {props.treeState == TreeState.dead && <Dead />}
+                </div>
+            </button>
+            
+            {props.itemsState?.[props.itemNum - 1]?.task_id ?
+                <div>
+                    <h2>{props.itemsState?.[props.itemNum - 1]?.consecutive_record ?? "データがありません"}</h2>
+                </div>
+            : <></> }
+        </div>
     )
 }
 

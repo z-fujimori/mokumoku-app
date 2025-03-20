@@ -1,8 +1,9 @@
 import React from 'react'
 import { TreeState } from '../../types/tree'
 import { invoke } from '@tauri-apps/api/core'
-import { FaTrashAlt } from "react-icons/fa";
-import { PlaseWithTask } from '../../types/task'
+import { FaTrashAlt } from "react-icons/fa"
+import { PlaseWithTask, Service } from '../../types/task'
+import { useForm } from 'react-hook-form'
 
 const TaskIndex = (props:{
     modalState: number,
@@ -12,15 +13,24 @@ const TaskIndex = (props:{
     setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>,
     setDeleteConfirmState: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
+    const {register, handleSubmit, formState: {errors}, setValue} = useForm<{amount:number}>();
 
     async function taskCompleted() {
-        await invoke<string>("grow_tree", {bordId: props.modalState, treeState: props.itemsState.tree_state_id})
+        await invoke<string>("stamp_task", {bordId: props.modalState, treeState: props.itemsState.tree_state_id})
             .then((res) => console.log(res)).catch((err) => console.error(err));
         
         // let newState = [...props.itemsState];
         // newState[props.modalState] = (props.itemsState[props.modalState] + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
         // console.log(newState);
         // props.setItemsState(newState);
+        props.setChangeBordInfo(true);
+        props.setModalState(0);
+    }
+
+    async function sendTaskAmount(data: {amount:number}) {
+        console.log("task_amount送信: ", data)
+        await invoke<string>("stamp_task", {bordId: props.modalState, treeState: props.itemsState.tree_state_id, amount: data.amount})
+            .then((res) => console.log(res)).catch((err) => console.error(err));
         props.setChangeBordInfo(true);
         props.setModalState(0);
     }
@@ -36,19 +46,37 @@ const TaskIndex = (props:{
                 <FaTrashAlt />
             </button>
 
-            <div>
-                <h2 className="text-lg font-bold text-gray-800 mb-2">{props.itemsState.name}</h2>
+            <div className='my-2'>
+                <h2 className="text-2xl font-bold text-gray-800">{props.itemsState.name}</h2>
             </div>
-            <div className='my-3'>
+
+            <div className=''>
                 <p className="text-gray-600">
+                    <span className='text-gray-500 mr-3'>目標:</span>
                     {props.itemsState.interval}日 で {props.itemsState.assignment}{props.itemsState.service}
                 </p>
             </div>
 
-            <button 
-                className="mt-4 w-full bg-green-500 text-white py-2 px-4 rounded-md font-bold hover:bg-green-600 active:bg-green-700 transition"
-                onClick={taskCompleted}
-            >目標タスク完了!!</button>
+            <form onSubmit={handleSubmit(sendTaskAmount)}>
+                <div className='h-[85px] flex mb-1'>
+                    <div className='w-2/3 flex flex-col items-end justify-end mr-5'>
+                        <input 
+                            type="number"
+                            step="0.01"
+                            placeholder='ex) 0.5 '
+                            {...register("amount", {required: "今日の成果を記録しよう！", valueAsNumber: true})}
+                            required
+                            className="appearance-none border-b border-gray-500 focus:outline-none focus:border-[#e2d6c4] text-5xl text-right pr-3 w-4/6 placeholder:text-3xl placeholder:text-end placeholder:leading-none" />
+                    </div>
+                    <div className='w-1/3 text-3xl flex flex-col justify-end items-start'>{Service[props.itemsState.service]}</div>
+                    {/* <div className='w-1/3 text-3xl bg-sky-200'>{props.itemsState.service}</div> */}
+                </div>
+
+                <button
+                    type='submit'
+                    className="mt-4 w-full bg-green-500 text-white py-2 px-4 rounded-md font-bold hover:bg-green-600 active:bg-green-700 transition"
+                >今日のタスクを登録</button>
+            </form>
             
         </>
     )

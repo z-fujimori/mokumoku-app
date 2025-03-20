@@ -8,6 +8,10 @@ import TaskModal from '../components/index/ TaskModal'
 import { PlaseWithTask } from '../types/task';
 import MenuIcon from '../components/index/MenuIcon';
 import AuthModal from '../components/index/AuthModal';
+import { FiUser } from "react-icons/fi"
+import { TbBook } from "react-icons/tb";
+import { BiCog } from "react-icons/bi";
+
 
 const Index = (props:{
   bordInfo: PlaseWithTask[],
@@ -30,25 +34,14 @@ const Index = (props:{
   }
 
   async function handleButton() {
-    await invoke<any>("get_tasks_info").then((res) => console.log(res)).catch((err) => console.error(err));
+    await invoke<any>("schedule_event").then((res) => console.log(res)).catch((err) => console.error(err));
   }
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const tasks = await invoke<PlaseWithTask[]>("get_tasks_info", {})
-  //       .catch(err => {
-  //         console.error("useEffect", err);
-  //         return []
-  //       });
-  //     setBordInfo(tasks);
-  //     console.log(tasks);
-  //   })();
-  //   setChangeBordInfo(prev => false);
-  // },[changeBordInfo])
+  console.log("ボードインフォ: ", props.bordInfo);
 
   return (
     <div>
-      <div className='w-screen h-[80vh] flex flex-col items-center justify-center'>
+      {/* <div className='w-screen h-[80vh] flex flex-col items-center justify-center'> */}
 
         <div className='h-1/5 '>
           
@@ -67,21 +60,26 @@ const Index = (props:{
         </div>
 
         <div className='h-1/5 '>
-          <button onClick={handleButton}>button</button>
+          {/* <button onClick={handleButton}>button</button> */}
         </div>
-      </div>
+        
+        {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={bordInfo} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
+        {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={bordInfo[taskModalState-1]} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
 
-      {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={bordInfo} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
-      {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={bordInfo[taskModalState-1]} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
-      {authModalState != 0 ? <AuthModal setAuthModalState={setAuthModalState}  setIsUpdateViewState={props.setIsUpdateViewState} /> : <></>}
+
+      {/* </div> */}
+      
+      
+      {/* {authModalState != 0 ? <AuthModal setAuthModalState={setAuthModalState}  setIsUpdateViewState={props.setIsUpdateViewState} /> : <></>}
 
       <div className='w-screen h-[20vh] bg-slate-700'>
         <div className='flex items-center justify-center h-full'>
-          <MenuIcon setAuthModalState={setAuthModalState} />
-          <MenuIcon setAuthModalState={setAuthModalState} />
-          <MenuIcon setAuthModalState={setAuthModalState} />
+          <MenuIcon icon={FiUser} setAuthModalState={setAuthModalState} />
+          <MenuIcon icon={TbBook} setAuthModalState={setAuthModalState} />
+          <MenuIcon icon={BiCog} setAuthModalState={setAuthModalState} />
         </div>
-      </div>
+      </div> */}
+
     </div>
     
   )

@@ -1,18 +1,22 @@
 CREATE TABLE IF NOT EXISTS user_infos (
     id INTEGER PRIMARY KEY,
     access_token TEXT NOT NULL,
-    refresh_token TEXT NOT NULL
+    refresh_token TEXT NOT NULL,
+    last_sckedule_ivent TEXT
 );
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     assignment REAL NOT NULL,
     service TEXT NOT NULL,
-    interval INTEGER NOT NULL
+    interval INTEGER NOT NULL,
+    limit_time INTEGER NOT NULL,
+    consecutive_record INTEGER NOT NULL  DEFAULT 0,
+    record_high INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS stamps (
     id INTEGER PRIMARY KEY,
-    amount INTEGER NOT NULL,
+    amount REAL NOT NULL,
     date TEXT NOT NULL,
     task_id INTEGER NOT NULL,
     FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE

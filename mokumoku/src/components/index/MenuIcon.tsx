@@ -1,18 +1,22 @@
 import React from 'react'
-import { FiUser } from "react-icons/fi"
+import { IconType } from 'react-icons/lib'
 
 const MenuIcon = (props:{
-    setAuthModalState: React.Dispatch<React.SetStateAction<number>>
+    icon: IconType,
+    strokeWidth: number,
+    clickIvent: () => void
 }) => {
 
-    const openComponent = () => {
-        props.setAuthModalState(1);
-        // setDeleteConfirmState(false);
+    const { icon: Icon } = props;  // アイコン。 エイリアスをつける
+
+    const clickEvent = () => {
+        props.clickIvent();
+        console.log("aa")
     }
 
     return (
-        <button className='bg-[#e2d6c4] bg-opacity-30 h-[80px] w-[80px] rounded-lg mx-[5px]' onClick={openComponent}>
-            <FiUser className='h-full w-full p-3 text-slate-700' />
+        <button className='bg-[#e2d6c4] bg-opacity-30 hover:bg-opacity-20 h-[80px] w-[80px] rounded-lg mx-[5px]' onClick={clickEvent}>
+            <Icon strokeWidth={props.strokeWidth} className='h-full w-full p-3 text-slate-700' />
         </button>
     )
 }
