@@ -12,7 +12,6 @@ const Item = (props:{
     itemNum: number,
     itemsState: PlaseWithTask[],
     treeState: number,
-    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>,
     setCreateTaskModalState: React.Dispatch<React.SetStateAction<number>>,
     setTaskModalState: React.Dispatch<React.SetStateAction<number>>
 }) => {
@@ -43,7 +42,7 @@ const Item = (props:{
                     {props.treeState == TreeState.dead && <Dead />}
                 </div>
             </button>
-            
+
             {props.itemsState?.[props.itemNum - 1]?.task_id ?
                 <div>
                     <h2>{props.itemsState?.[props.itemNum - 1]?.consecutive_record ?? "データがありません"}</h2>

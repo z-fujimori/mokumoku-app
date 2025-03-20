@@ -2,7 +2,7 @@ use std::env;
 use dotenv::dotenv;
 use reqwest::{self, header::CONTENT_TYPE, Client};
 use reqwest::tls::Version;
-use tauri::{State};
+use tauri::State;
 use sqlx::Row;
 use serde_json::json;
 use crate::types::{LoginRequest, LoginResponse, Token};

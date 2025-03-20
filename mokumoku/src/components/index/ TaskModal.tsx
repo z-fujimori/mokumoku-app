@@ -1,7 +1,4 @@
 import React, { useState } from 'react'
-import { TreeState } from '../../types/tree'
-import { invoke } from '@tauri-apps/api/core'
-import { FaTrashAlt } from "react-icons/fa";
 import { PlaseWithTask } from '../../types/task'
 import TaskIndex from '../task/TaskIndex';
 import DeleteConfirm from '../task/DeleteConfirm';
@@ -10,7 +7,6 @@ const  TaskModal = (props:{
     modalState: number,
     setModalState: React.Dispatch<React.SetStateAction<number>>,
     itemsState: PlaseWithTask,
-    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>,
     setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
     const [deleteConfirmState, setDeleteConfirmState] = useState(false);
@@ -34,7 +30,6 @@ const  TaskModal = (props:{
                         modalState={props.modalState} 
                         setModalState={props.setModalState} 
                         itemsState={props.itemsState} 
-                        setItemsState={props.setItemsState} 
                         setChangeBordInfo={props.setChangeBordInfo}
                         setDeleteConfirmState={setDeleteConfirmState} />
                 }

@@ -1,5 +1,4 @@
 import React from 'react'
-import { TreeState } from '../../types/tree'
 import { invoke } from '@tauri-apps/api/core'
 import { FaTrashAlt } from "react-icons/fa"
 import { PlaseWithTask, Service } from '../../types/task'
@@ -9,23 +8,10 @@ const TaskIndex = (props:{
     modalState: number,
     setModalState: React.Dispatch<React.SetStateAction<number>>,
     itemsState: PlaseWithTask,
-    setItemsState: React.Dispatch<React.SetStateAction<TreeState[]>>,
     setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>,
     setDeleteConfirmState: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
-    const {register, handleSubmit, formState: {errors}, setValue} = useForm<{amount:number}>();
-
-    async function taskCompleted() {
-        await invoke<string>("stamp_task", {bordId: props.modalState, treeState: props.itemsState.tree_state_id})
-            .then((res) => console.log(res)).catch((err) => console.error(err));
-        
-        // let newState = [...props.itemsState];
-        // newState[props.modalState] = (props.itemsState[props.modalState] + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
-        // console.log(newState);
-        // props.setItemsState(newState);
-        props.setChangeBordInfo(true);
-        props.setModalState(0);
-    }
+    const {register, handleSubmit} = useForm<{amount:number}>();
 
     async function sendTaskAmount(data: {amount:number}) {
         console.log("task_amount送信: ", data)

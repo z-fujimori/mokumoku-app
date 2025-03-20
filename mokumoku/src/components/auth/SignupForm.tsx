@@ -3,7 +3,6 @@ import { invoke } from '@tauri-apps/api/core';
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TextField, Button, Typography, Container } from "@mui/material";
-import { supabase } from "../../lib/supabaseClient";
 import { signupSchema } from "../../lib/authSchema";
 import { z } from "zod";
 import { ViewState } from "../../types";

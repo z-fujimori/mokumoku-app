@@ -1,16 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { invoke } from '@tauri-apps/api/core';
-import Plus from '../components/tree/Plus'
+import React, { useState } from 'react'
 import Item from '../components/tree/Item'
-import { TreeState } from '../types/tree'
 import CreateTaskModal from '../components/index/CreateTaskModal'
 import TaskModal from '../components/index/ TaskModal'
 import { PlaseWithTask } from '../types/task';
-import MenuIcon from '../components/index/MenuIcon';
-import AuthModal from '../components/index/AuthModal';
-import { FiUser } from "react-icons/fi"
-import { TbBook } from "react-icons/tb";
-import { BiCog } from "react-icons/bi";
 
 
 const Index = (props:{
@@ -18,24 +10,20 @@ const Index = (props:{
   setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>,
   setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
-  const [items, setItems] = useState<TreeState[]>([0,0,0,0]);
   const [createTaskModalState, setCreateTaskModalState] = useState(0);
   const [taskModalState, setTaskModalState] = useState(0);
-  const [authModalState, setAuthModalState] = useState(0);
-  // const [bordInfo, setBordInfo] = useState<PlaseWithTask[]>([]);
-  // const [changeBordInfo, setChangeBordInfo] = useState(false);
   const bordInfo = props.bordInfo;
   const setChangeBordInfo = props.setChangeBordInfo;
 
-  function changeItemState(state: TreeState, setState: React.Dispatch<React.SetStateAction<TreeState>>) {
-    const newState = (state + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
-    setState(newState);
-    console.log("state更新");
-  }
+  // function changeItemState(state: TreeState, setState: React.Dispatch<React.SetStateAction<TreeState>>) {
+  //   const newState = (state + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
+  //   setState(newState);
+  //   console.log("state更新");
+  // }
 
-  async function handleButton() {
-    await invoke<any>("schedule_event").then((res) => console.log(res)).catch((err) => console.error(err));
-  }
+  // async function handleButton() {
+  //   await invoke<any>("schedule_event").then((res) => console.log(res)).catch((err) => console.error(err));
+  // }
 
   console.log("ボードインフォ: ", props.bordInfo);
 
@@ -49,13 +37,13 @@ const Index = (props:{
 
         <div className='h-3/5 flex items-center justify-between'>
           {/* <button onClick={()=>changeItemState(leftItem,setLeftItem)}> */}
-            <Item itemNum={1} itemsState={bordInfo} treeState={bordInfo[0].tree_state_id} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
+            <Item itemNum={1} itemsState={bordInfo} treeState={bordInfo[0].tree_state_id} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
           {/* </button> */}
           {/* <button onClick={()=>changeItemState(centerItem,setCenterItem)}> */}
-            <Item itemNum={2} itemsState={bordInfo} treeState={bordInfo[1].tree_state_id} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
+            <Item itemNum={2} itemsState={bordInfo} treeState={bordInfo[1].tree_state_id} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
           {/* </button> */}
           {/* <button onClick={()=>changeItemState(rightItem,setRightItem)}> */}
-            <Item itemNum={3} itemsState={bordInfo} treeState={bordInfo[2].tree_state_id} setItemsState={setItems} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
+            <Item itemNum={3} itemsState={bordInfo} treeState={bordInfo[2].tree_state_id} setCreateTaskModalState={setCreateTaskModalState} setTaskModalState={setTaskModalState} />
           {/* </button> */}
         </div>
 
@@ -63,8 +51,8 @@ const Index = (props:{
           {/* <button onClick={handleButton}>button</button> */}
         </div>
         
-        {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={bordInfo} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
-        {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={bordInfo[taskModalState-1]} setItemsState={setItems} setChangeBordInfo={setChangeBordInfo} /> : <></>}
+        {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={bordInfo} setChangeBordInfo={setChangeBordInfo} /> : <></>}
+        {taskModalState != 0 ? <TaskModal modalState={taskModalState} setModalState={setTaskModalState} itemsState={bordInfo[taskModalState-1]} setChangeBordInfo={setChangeBordInfo} /> : <></>}
 
 
       {/* </div> */}
