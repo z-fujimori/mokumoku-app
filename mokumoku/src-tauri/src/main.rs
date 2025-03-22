@@ -40,7 +40,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         block_on(data::migrate_database(&sqlite_pool))?;
         println!("db作成");
     }
-
+    
+    // envファイルを読み込む準備 ここで読み込んで各メソッドで読み込まずに済む
+    dotenv::dotenv().ok();
     tauri::Builder::default()
         // API コマンドを登録
         .invoke_handler(tauri::generate_handler![

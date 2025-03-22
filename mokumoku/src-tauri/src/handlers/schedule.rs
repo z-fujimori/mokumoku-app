@@ -13,13 +13,13 @@ pub async fn schedule_event_dayend(sqlite_pool: State<'_, sqlx::SqlitePool>) -> 
     println!("{}",formatday);
 
     // 日時を更新
-    // let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
-    // sqlx::query("UPDATE user_infos SET last_sckedule_ivent = ? WHERE id = 1")
-    //     .bind(formatday)
-    //     .execute(&mut *tx)
-    //     .await
-    //     .map_err(|e| e.to_string())?;
-    // tx.commit().await.map_err(|e| e.to_string())?;
+    let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
+    sqlx::query("UPDATE user_infos SET last_sckedule_ivent = ? WHERE id = 1")
+        .bind(formatday)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| e.to_string())?;
+    tx.commit().await.map_err(|e| e.to_string())?;
 
     let data = get_tasks_info(sqlite_pool.clone()).await.map_err(|e| format!("errorr!: {:?}", e))?;
     println!("{:?}",data);

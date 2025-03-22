@@ -27,6 +27,7 @@ const LoginForm = (props:{
         const { email, password } = input;
         const ret_token = await invoke<string>("login", {"email": email, "password": password})
             .then(() => {
+                console.log("t30");
                 props.setIsUpdateViewState(true);
                 // props.setViewState(ViewState.index);  // ログイン画面からロードを入れたかったが無理そうか？
             })
