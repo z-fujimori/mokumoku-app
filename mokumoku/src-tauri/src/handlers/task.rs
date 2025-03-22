@@ -59,7 +59,8 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
 
     let url = "https://crojyohgwneomqasuuaq.supabase.co/rest/v1/tasks";
     // dotenv().ok();
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let secret_key = env!("SUPABASE_ANON_KEY");
     let new_task = StoreTask {
         name: name.clone(),
         assignment: assignment.clone(),
@@ -240,6 +241,8 @@ pub async fn off_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64) ->R
 
 #[tauri::command]
 pub async fn demo_env() -> Result<String, String> {
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
-    Ok(secret_key)
+    // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let secret_key = env!("SUPABASE_ANON_KEY");
+
+    Ok("OK".to_string())
 }

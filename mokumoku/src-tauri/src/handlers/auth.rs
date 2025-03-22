@@ -26,7 +26,8 @@ pub async fn check_auth(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<bool
 pub async fn login(sqlite_pool: State<'_, sqlx::SqlitePool>, email: &str, password: &str) -> Result<bool, String> {
     println!("login");
     // dotenv().ok();
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let secret_key = env!("SUPABASE_ANON_KEY");
     let client = Client::builder()
         // .max_tls_version(Version::TLS_1_2)                             // 本番でコメントアウト
         // .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）    // 本番でコメントアウト 
@@ -77,7 +78,8 @@ pub async  fn signup(sqlite_pool: State<'_, sqlx::SqlitePool>, email: String, pa
     println!("{}, {}", email, password);
 
     // dotenv().ok();
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let secret_key = env!("SUPABASE_ANON_KEY");
     println!("{secret_key}");
 
     let client = Client::builder()
@@ -129,9 +131,9 @@ pub async  fn signup(sqlite_pool: State<'_, sqlx::SqlitePool>, email: String, pa
 pub async fn refresh(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<String, String> {
     println!("リフレッシュ関数");
     // dotenv().ok();
-    let url = env::var("VITE_SUPABASE_URL").expect("VITE_SUPABASE_URL not set in .env");
-    let url = url + "/auth/v1/token?grant_type=refresh_token";
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let url = env!("SUPABASE_URL");
+    let url = url.to_string() + "/auth/v1/token?grant_type=refresh_token";
+    let secret_key = env!("SUPABASE_ANON_KEY");
 
     let row = sqlx::query("SELECT * FROM user_infos ORDER BY id DESC LIMIT 1")
         .fetch_optional(&*sqlite_pool)

@@ -8,6 +8,7 @@ const Archive = () => {
     async function handleButton() {
         await invoke<any>("demo_env").then((res) => {console.log(res); setDemoEnv(res)}).catch((err) => console.error(err));
     }
+
     return (
         <div className='h-auto justify-center items-center'>
             <h1 className='text-xl'>開発中...</h1>

@@ -82,8 +82,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             });
 
-            println!("check");
-
             Ok(())
         })
         .run(tauri::generate_context!())
