@@ -237,3 +237,9 @@ pub async fn off_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64) ->R
 
     Ok("ok".to_string())
 }
+
+#[tauri::command]
+pub async fn demo_env() -> Result<String, String> {
+    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    Ok(secret_key)
+}

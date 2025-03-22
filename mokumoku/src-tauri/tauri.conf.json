@@ -19,10 +19,13 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src *; script-src * 'unsafe-inline'; style-src * 'unsafe-inline'; img-src * data:;"
     }
   },
   "bundle": {
+    "resources": [
+      ".env"
+    ],
     "active": true,
     "targets": "all",
     "icon": [

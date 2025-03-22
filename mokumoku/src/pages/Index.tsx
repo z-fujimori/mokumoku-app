@@ -4,7 +4,6 @@ import CreateTaskModal from '../components/index/CreateTaskModal'
 import TaskModal from '../components/index/ TaskModal'
 import { PlaseWithTask } from '../types/task';
 
-
 const Index = (props:{
   bordInfo: PlaseWithTask[],
   setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>,
@@ -19,10 +18,6 @@ const Index = (props:{
   //   const newState = (state + 1) % Object.keys(TreeState).filter(key => isNaN(Number(key))).length;
   //   setState(newState);
   //   console.log("state更新");
-  // }
-
-  // async function handleButton() {
-  //   await invoke<any>("schedule_event").then((res) => console.log(res)).catch((err) => console.error(err));
   // }
 
   console.log("ボードインフォ: ", props.bordInfo);
@@ -48,7 +43,7 @@ const Index = (props:{
         </div>
 
         <div className='h-1/5 '>
-          {/* <button onClick={handleButton}>button</button> */}
+          
         </div>
         
         {createTaskModalState != 0 ? <CreateTaskModal modalState={createTaskModalState} setModalState={setCreateTaskModalState} itemsState={bordInfo} setChangeBordInfo={setChangeBordInfo} /> : <></>}
