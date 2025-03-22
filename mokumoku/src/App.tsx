@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
-import Auth from "./pages/Auth"
-import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import { PlaseWithTask } from "./types/task";
 import Load from "./pages/Load";
 import { ViewState } from "./types";
@@ -29,7 +28,7 @@ function App() {
       console.log(tasks[0]);
       console.log(tasks[0].tree_state_id);
     })();
-    setChangeBordInfo(prev => false);
+    setChangeBordInfo(() => false);
   },[changeBordInfo]);
 
   // ログインしているか。 Index,Auth,Loadを切り替え
@@ -57,7 +56,7 @@ function App() {
 
   // 0時に動く関数をlisten
   useEffect(() => {
-    const unlisten = listen("schedule_event", (event) => {
+    const unlisten = listen("schedule_event", () => {
       console.log("定期関数listen");
       setChangeBordInfo(true);
     });

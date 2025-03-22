@@ -1,4 +1,3 @@
-use core::task;
 use std::{collections::BTreeMap, env};
 use chrono::Local;
 use dotenv::dotenv;
@@ -56,21 +55,12 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
     println!("{name}, {assignment}, {service}, {interval}");
 
     let token: String = auth::refresh(sqlite_pool.clone()).await.map_err(|e| format!("refreshエラー: {:?}", e))?;
-    // localDBからaccess_tokenを取得
-    // let row = sqlx::query("SELECT * FROM user_infos ORDER BY id DESC LIMIT 1")
-    //     .fetch_optional(&*sqlite_pool)
-    //     .await
-    //     .map_err(|e| e.to_string())?;
-    // let token: String = row
-    //     .map(|row| Token {token: row.get("access_token"),})
-    //     .map(|token| token.token) // `Option<Token>` を `Option<String>` に変換
-    //     .unwrap_or("".to_string());
-    // println!("{:?}", token);
     println!("get token, {}", token);
 
     let url = "https://crojyohgwneomqasuuaq.supabase.co/rest/v1/tasks";
-    dotenv().ok();
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    // dotenv().ok();
+    // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let secret_key = env!("SUPABASE_ANON_KEY");
     let new_task = StoreTask {
         name: name.clone(),
         assignment: assignment.clone(),
@@ -81,8 +71,8 @@ pub async fn add_task(sqlite_pool: State<'_, sqlx::SqlitePool>,  name: String, a
     // `reqwest` クライアント
     // let client = Client::new();
     let client = Client::builder()
-        .max_tls_version(Version::TLS_1_2)
-        .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）
+        // .max_tls_version(Version::TLS_1_2)                             // 本番でコメントアウト
+        // .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）    // 本番でコメントアウト
         .build()
         .map_err(|e| format!("Client build error: {:?}", e))?;
     
@@ -170,13 +160,11 @@ pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, t
                 r.try_get::<i64, _>("consecutive_record").unwrap_or(0)
             )
         }).unwrap_or_else(|| (0.0, 0.0, 0, 0));
-    let already_task_clear = (
-        if past_amount_data.0 == 0.0 && past_amount_data.1 == 0.0 {
+    let already_task_clear = if past_amount_data.0 == 0.0 && past_amount_data.1 == 0.0 {
             false
         } else {
             past_amount_data.0 >= past_amount_data.1
-        }
-    );
+        };
     println!("{} total:{} assi:{}", already_task_clear, past_amount_data.0, past_amount_data.1);
 
     // タスク登録
@@ -249,4 +237,12 @@ pub async fn off_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64) ->R
     tx.commit().await.map_err(|e| e.to_string())?;
 
     Ok("ok".to_string())
+}
+
+#[tauri::command]
+pub async fn demo_env() -> Result<String, String> {
+    // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let secret_key = env!("SUPABASE_ANON_KEY");
+
+    Ok("OK".to_string())
 }

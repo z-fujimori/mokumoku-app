@@ -3,7 +3,6 @@ import { invoke } from '@tauri-apps/api/core'
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TextField, Button, Typography, Container } from "@mui/material";
-import { supabase } from "../../lib/supabaseClient";
 import { signupSchema } from "../../lib/authSchema";
 import { z } from "zod";
 import { ViewState } from "../../types";
@@ -28,6 +27,7 @@ const LoginForm = (props:{
         const { email, password } = input;
         const ret_token = await invoke<string>("login", {"email": email, "password": password})
             .then(() => {
+                console.log("t30");
                 props.setIsUpdateViewState(true);
                 // props.setViewState(ViewState.index);  // ログイン画面からロードを入れたかったが無理そうか？
             })

@@ -4,11 +4,9 @@ import MenuIcon from '../components/index/MenuIcon';
 import AuthModal from '../components/index/AuthModal';
 import { FiUser } from "react-icons/fi"
 import { TbBook } from "react-icons/tb";
-import { BiCog } from "react-icons/bi";
 import Index from './Index';
 import { MainPageState } from '../types';
 import { SiGumtree } from "react-icons/si";
-import { IoMdSettings } from "react-icons/io";
 import Archive from './Archive';
 
 const Main = (props:{

@@ -2,7 +2,7 @@ use std::env;
 use dotenv::dotenv;
 use reqwest::{self, header::CONTENT_TYPE, Client};
 use reqwest::tls::Version;
-use tauri::{State};
+use tauri::State;
 use sqlx::Row;
 use serde_json::json;
 use crate::types::{LoginRequest, LoginResponse, Token};
@@ -25,11 +25,12 @@ pub async fn check_auth(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<bool
 #[tauri::command]
 pub async fn login(sqlite_pool: State<'_, sqlx::SqlitePool>, email: &str, password: &str) -> Result<bool, String> {
     println!("login");
-    dotenv().ok();
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    // dotenv().ok();
+    // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let secret_key = env!("SUPABASE_ANON_KEY");
     let client = Client::builder()
-        .max_tls_version(Version::TLS_1_2)
-        .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）
+        // .max_tls_version(Version::TLS_1_2)                             // 本番でコメントアウト
+        // .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）    // 本番でコメントアウト 
         .build()
         .map_err(|e| format!("Client build error: {:?}", e))?;
     let url = "https://crojyohgwneomqasuuaq.supabase.co/auth/v1/token?grant_type=password";
@@ -54,7 +55,7 @@ pub async fn login(sqlite_pool: State<'_, sqlx::SqlitePool>, email: &str, passwo
     // JSON をパース
     let token: LoginResponse = serde_json::from_str(&body)
         .map_err(|e| format!("Failed to parse JSON: {:?}, body: {}", e, body))?;
-    println!("ログイントークン取得成功: {:?}", token.access_token);
+    println!("ログイントークン取得成功");
 
     // tokenをlocalに保存
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
@@ -76,13 +77,14 @@ pub async  fn signup(sqlite_pool: State<'_, sqlx::SqlitePool>, email: String, pa
     println!("ログイン処理");
     println!("{}, {}", email, password);
 
-    dotenv().ok();
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    // dotenv().ok();
+    // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    let secret_key = env!("SUPABASE_ANON_KEY");
     println!("{secret_key}");
 
     let client = Client::builder()
-        .max_tls_version(Version::TLS_1_2)
-        .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）
+        // .max_tls_version(Version::TLS_1_2)                             // 本番でコメントアウト
+        // .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）    // 本番でコメントアウト
         .build()
         .map_err(|e| format!("Client build error: {:?}", e))?;
     let url = "https://crojyohgwneomqasuuaq.supabase.co/auth/v1/signup";
@@ -109,7 +111,7 @@ pub async  fn signup(sqlite_pool: State<'_, sqlx::SqlitePool>, email: String, pa
     // JSON をパース
     let token: LoginResponse = serde_json::from_str(&body)
         .map_err(|e| format!("Failed to parse JSON: {:?}, body: {}", e, body))?;
-    println!("ログイントークン取得成功: {:?}", token.access_token);
+    println!("ログイントークン取得成功");
 
     // tokenをlocalに保存
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
@@ -128,10 +130,10 @@ pub async  fn signup(sqlite_pool: State<'_, sqlx::SqlitePool>, email: String, pa
 // #[tauri::command]
 pub async fn refresh(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<String, String> {
     println!("リフレッシュ関数");
-    dotenv().ok();
-    let url = env::var("VITE_SUPABASE_URL").expect("VITE_SUPABASE_URL not set in .env");
-    let url = url + "/auth/v1/token?grant_type=refresh_token";
-    let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
+    // dotenv().ok();
+    let url = env!("SUPABASE_URL");
+    let url = url.to_string() + "/auth/v1/token?grant_type=refresh_token";
+    let secret_key = env!("SUPABASE_ANON_KEY");
 
     let row = sqlx::query("SELECT * FROM user_infos ORDER BY id DESC LIMIT 1")
         .fetch_optional(&*sqlite_pool)
@@ -143,8 +145,8 @@ pub async fn refresh(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<String, 
         .unwrap_or("".to_string());
 
     let client = Client::builder()
-        .max_tls_version(Version::TLS_1_2)
-        .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）
+        // .max_tls_version(Version::TLS_1_2)                             // 本番でコメントアウト
+        // .danger_accept_invalid_certs(true) // 証明書エラー回避（開発用）    // 本番でコメントアウト
         .build()
         .map_err(|e| format!("Client build error: {:?}", e))?;
     let response = client
@@ -165,7 +167,7 @@ pub async fn refresh(sqlite_pool: State<'_, sqlx::SqlitePool>) ->Result<String, 
     // JSON をパース
     let token: LoginResponse = serde_json::from_str(&body)
         .map_err(|e| format!("Failed to parse JSON: {:?}, body: {}", e, body))?;
-    println!("ログイントークン取得成功: {:?}", token.access_token.clone());
+    println!("ログイントークン取得成功");
 
     // tokenをlocalに保存
     let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;

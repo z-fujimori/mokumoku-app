@@ -13,13 +13,13 @@ pub async fn schedule_event_dayend(sqlite_pool: State<'_, sqlx::SqlitePool>) -> 
     println!("{}",formatday);
 
     // 日時を更新
-    // let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
-    // sqlx::query("UPDATE user_infos SET last_sckedule_ivent = ? WHERE id = 1")
-    //     .bind(formatday)
-    //     .execute(&mut *tx)
-    //     .await
-    //     .map_err(|e| e.to_string())?;
-    // tx.commit().await.map_err(|e| e.to_string())?;
+    let mut tx = sqlite_pool.begin().await.map_err(|e| e.to_string())?;
+    sqlx::query("UPDATE user_infos SET last_sckedule_ivent = ? WHERE id = 1")
+        .bind(formatday)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| e.to_string())?;
+    tx.commit().await.map_err(|e| e.to_string())?;
 
     let data = get_tasks_info(sqlite_pool.clone()).await.map_err(|e| format!("errorr!: {:?}", e))?;
     println!("{:?}",data);
@@ -102,27 +102,27 @@ pub async fn yesterday_total_stamp(sqlite_pool: State<'_, sqlx::SqlitePool>, tas
     Ok(amount)
 }
 
-async fn reset_tree(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
+// async fn reset_tree(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
 
-    let data = get_tasks_info(sqlite_pool).await.map_err(|e| format!("errorr!: {:?}", e))?;
-    println!("{:?}",data);
+//     let data = get_tasks_info(sqlite_pool).await.map_err(|e| format!("errorr!: {:?}", e))?;
+//     println!("{:?}",data);
 
-    Ok("ok".to_string())
-}
+//     Ok("ok".to_string())
+// }
 
-fn die_tree(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
-    Ok("ok".to_string())
-}
+// fn die_tree(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
+//     Ok("ok".to_string())
+// }
 
-pub async fn total_stamp(sqlite_pool: State<'_, sqlx::SqlitePool>, task_id: i32, date: String) -> Result<f64, String> {
-    let row = sqlx::query("SELECT SUM(amount) AS total_amount FROM stamps WHERE task_id = ? AND DATE(date) = DATE(?)")
-        .bind(task_id)
-        .bind(date)
-        .fetch_optional(&*sqlite_pool)
-        .await
-        .map_err(|e| e.to_string())?;
+// pub async fn total_stamp(sqlite_pool: State<'_, sqlx::SqlitePool>, task_id: i32, date: String) -> Result<f64, String> {
+//     let row = sqlx::query("SELECT SUM(amount) AS total_amount FROM stamps WHERE task_id = ? AND DATE(date) = DATE(?)")
+//         .bind(task_id)
+//         .bind(date)
+//         .fetch_optional(&*sqlite_pool)
+//         .await
+//         .map_err(|e| e.to_string())?;
 
-    let amount: f64 = row.map(|r| r.try_get::<f64, _>("total_amount").unwrap_or(0.0)).unwrap_or(0.0);
+//     let amount: f64 = row.map(|r| r.try_get::<f64, _>("total_amount").unwrap_or(0.0)).unwrap_or(0.0);
 
-    Ok(amount)
-}
+//     Ok(amount)
+// }

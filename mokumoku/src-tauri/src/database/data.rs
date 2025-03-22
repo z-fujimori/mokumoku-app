@@ -1,4 +1,4 @@
-use std::{str::FromStr};
+use std::str::FromStr;
 use sqlx::{sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous}, SqlitePool};
 
 /// このモジュール内の関数の戻り値型

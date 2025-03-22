@@ -41,6 +41,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("db作成");
     }
 
+    // envファイルを読み込む準備 ここで読み込んで各メソッドで読み込まずに済む
+    dotenv::dotenv().ok();
     tauri::Builder::default()
         // API コマンドを登録
         .invoke_handler(tauri::generate_handler![
@@ -53,6 +55,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             task::grow_tree,
             task::off_task,
             task::stamp_task,
+            task::demo_env,
             schedule::schedule_event_dayend
         ])
         .setup(|app| {
@@ -78,8 +81,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             });
-
-            println!("check");
 
             Ok(())
         })
