@@ -240,7 +240,7 @@ pub async fn off_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64) ->R
 }
 
 #[tauri::command]
-pub async fn all_task(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
+pub async fn all_task(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<Vec<Task>, String> {
     let query = "SELECT * FROM tasks";
     let mut rows = sqlx::query(&query)
         .fetch(&*sqlite_pool);
@@ -260,7 +260,7 @@ pub async fn all_task(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String
         tasks.insert(id, Task{id, name, assignment, service, interval, limit_time, consecutive_record, record_high});
     }
 
-    Ok("ok".to_string())
+    Ok(tasks.into_iter().map(|(_k, v)| v).collect())
 }
 
 #[tauri::command]

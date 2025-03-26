@@ -20,6 +20,17 @@ export type PlaseWithTask = {
     record_high: number
 }
 
+export type Task = {
+    id: number,
+    name: string,
+    assignment: number,
+    service: string,
+    interval: number,
+    limit_time: number,
+    consecutive_record: number,
+    record_high: number
+}
+
 export const Service: Record<string, string> = {
     "h": "時間",
     "p": "ページ",

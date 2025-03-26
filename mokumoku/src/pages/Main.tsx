@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { PlaseWithTask } from '../types/task'
+import { PlaseWithTask, Task } from '../types/task'
 import MenuIcon from '../components/index/MenuIcon';
 import AuthModal from '../components/index/AuthModal';
 import { FiUser } from "react-icons/fi"
@@ -12,7 +12,8 @@ import Archive from './Archive';
 const Main = (props:{
     bordInfo: PlaseWithTask[],
     setChangeBordInfo: React.Dispatch<React.SetStateAction<boolean>>,
-    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>
+    setIsUpdateViewState: React.Dispatch<React.SetStateAction<boolean>>,
+    taskInfo: Task[]
 }) => {
     const [authModalState, setAuthModalState] = useState(0);
     const [mainPageState, setMainPageState] = useState(0);
@@ -21,7 +22,7 @@ const Main = (props:{
         <div>
             <div className='w-screen h-[80vh] flex flex-col items-center justify-center'>
                 {mainPageState == MainPageState.index && <Index bordInfo={props.bordInfo} setChangeBordInfo={props.setChangeBordInfo} setIsUpdateViewState={props.setIsUpdateViewState} /> }
-                {mainPageState == MainPageState.archive && <Archive />}
+                {mainPageState == MainPageState.archive && <Archive taskInfo={props.taskInfo} />}
             </div>
             
             {authModalState != 0 ? <AuthModal setAuthModalState={setAuthModalState}  setIsUpdateViewState={props.setIsUpdateViewState} /> : <></>}

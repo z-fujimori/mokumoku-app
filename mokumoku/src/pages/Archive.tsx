@@ -1,9 +1,12 @@
 // import React from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import { useState } from 'react';
+import { Task } from '../types/task'
 import ArchiveItem from '../components/archive/ArchiveItem';
 
-const Archive = () => {
+const Archive = (props:{
+    taskInfo: Task[],
+}) => {
     const [demoEnv, setDemoEnv] = useState("button");
 
     async function handleButton() {
@@ -16,12 +19,9 @@ const Archive = () => {
             <button onClick={handleButton}>{demoEnv}</button>
             <div className='w-full h-72 overflow-y-auto'>
                 <div className='flex flex-col items-center justify-center'>
-                    <ArchiveItem />
-                    <ArchiveItem />
-                    <ArchiveItem />
-                    <ArchiveItem />
-                    <ArchiveItem />
-                    <ArchiveItem />
+                    {props.taskInfo.map((task) => (
+                        <ArchiveItem task={task} />
+                    ))}
                 </div>
             </div>
         </div>
