@@ -131,7 +131,7 @@ pub async fn get_taskid_from_bord(sqlite_pool: State<'_, sqlx::SqlitePool>, bord
 
 #[tauri::command]
 pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, treeState: i64, amount: f64) ->Result<String, String> {
-    println!("今日のタスク量 {}", amount);
+    println!("今日のタスク量:{} bord_id:{} tree_state:{}", amount, bordId, treeState);
     let now = Local::now(); // 現在のローカル時刻を取得
     let now_date = now.format("%Y-%m-%d %H:%M:%S").to_string(); // フォーマット
     let task_id = get_taskid_from_bord(sqlite_pool.clone(), bordId).await.map_err(|e| format!("stamp_taskでtask_id取得失敗: {:?}", e))?;

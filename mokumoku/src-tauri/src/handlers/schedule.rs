@@ -10,6 +10,7 @@ pub async fn schedule_event_dayend(sqlite_pool: State<'_, sqlx::SqlitePool>) -> 
     let today = Local::now().date_naive(); // 現在の日付（NaiveDate）
     let yesterday = today - Duration::days(1); // 1日前の日付を計算
     let formatday = yesterday.format("%Y-%m-%d").to_string(); // フォーマット
+    println!("現在の日付  {}", today);
     println!("{}",formatday);
 
     // 日時を更新
@@ -100,6 +101,30 @@ pub async fn yesterday_total_stamp(sqlite_pool: State<'_, sqlx::SqlitePool>, tas
     let amount: f64 = row.map(|r| r.try_get::<f64, _>("total_amount").unwrap_or(0.0)).unwrap_or(0.0);
 
     Ok(amount)
+}
+
+#[tauri::command]
+pub async fn check_schedule(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
+
+    let today = Local::now().date_naive();
+    let yesterday = today - Duration::days(1); // 1日前の日付を計算
+    let formatday = yesterday.format("%Y-%m-%d").to_string(); // フォーマット
+
+    let row = sqlx::query("SELECT * FROM user_infos ORDER BY id DESC LIMIT 1")
+        .fetch_optional(&*sqlite_pool)
+        .await
+        .map_err(|e| e.to_string())?;
+    let last_schedule_date: String = row
+        .map(|row| row.get("last_sckedule_ivent"))
+        // .map(|token| token.token) // `Option<Token>` を `Option<String>` に変換
+        .unwrap_or("".to_string());
+
+    println!("{} {}", formatday, last_schedule_date);
+    if formatday != last_schedule_date {
+        let _ = schedule_event_dayend(sqlite_pool).await.map_err(|e| format!("error: {:?}", e));
+    }
+
+    Ok("ok".to_string())
 }
 
 // async fn reset_tree(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<String, String> {
