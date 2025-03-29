@@ -50,13 +50,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             auth::login,
             auth::signup,
             auth::logout,
+            task::all_task,
             task::add_task, 
             task::get_tasks_info,
             task::grow_tree,
             task::off_task,
             task::stamp_task,
             task::demo_env,
-            schedule::schedule_event_dayend
+            schedule::schedule_event_dayend,
+            schedule::check_schedule
         ])
         .setup(|app| {
             // 多分これで関数の引数にsqlite_poolが入る

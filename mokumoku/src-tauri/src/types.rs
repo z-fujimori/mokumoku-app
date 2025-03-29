@@ -48,6 +48,18 @@ pub struct PlaseWithTask {
     pub record_high: i64
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Task {
+    pub id: i32,
+    pub name: String,
+    pub assignment: f64,
+    pub service: String,
+    pub interval: i64,
+    pub limit_time: i64,
+    pub consecutive_record: i64,
+    pub record_high: i64
+}
+
 
 #[derive(Debug)]
 pub enum Position {

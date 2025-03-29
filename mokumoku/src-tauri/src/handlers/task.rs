@@ -2,9 +2,9 @@ use std::{collections::BTreeMap, env};
 use chrono::Local;
 use dotenv::dotenv;
 use tauri::State;
-use sqlx::Row;
+use sqlx::{query, Row};
 use reqwest::{self, header::CONTENT_TYPE, Client};
-use crate::types::{PlaseWithTask, Position, StoreTask};
+use crate::types::{PlaseWithTask, Position, StoreTask, Task};
 use reqwest::tls::Version;
 use futures::TryStreamExt;
 use super::auth;
@@ -131,7 +131,7 @@ pub async fn get_taskid_from_bord(sqlite_pool: State<'_, sqlx::SqlitePool>, bord
 
 #[tauri::command]
 pub async fn stamp_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64, treeState: i64, amount: f64) ->Result<String, String> {
-    println!("今日のタスク量 {}", amount);
+    println!("今日のタスク量:{} bord_id:{} tree_state:{}", amount, bordId, treeState);
     let now = Local::now(); // 現在のローカル時刻を取得
     let now_date = now.format("%Y-%m-%d %H:%M:%S").to_string(); // フォーマット
     let task_id = get_taskid_from_bord(sqlite_pool.clone(), bordId).await.map_err(|e| format!("stamp_taskでtask_id取得失敗: {:?}", e))?;
@@ -240,9 +240,34 @@ pub async fn off_task(sqlite_pool: State<'_, sqlx::SqlitePool>, bordId: i64) ->R
 }
 
 #[tauri::command]
+pub async fn all_task(sqlite_pool: State<'_, sqlx::SqlitePool>) -> Result<Vec<Task>, String> {
+    let query = "SELECT * FROM tasks";
+    let mut rows = sqlx::query(&query)
+        .fetch(&*sqlite_pool);
+        // .map_err(|e| e.to_string())?;
+
+    let mut tasks = BTreeMap::new();
+    while let Some(row) = rows.try_next().await.map_err(|e| e.to_string())? {
+        let id: i32 = row.try_get("id").map_err(|e| e.to_string())?;
+        let name: String = row.try_get("name").map_err(|e| e.to_string())?;
+        let assignment: f64 = row.try_get("assignment").map_err(|e| e.to_string())?;
+        let service: String = row.try_get("service").map_err(|e| e.to_string())?;
+        let interval: i64 = row.try_get("interval").map_err(|e| e.to_string())?;
+        let limit_time: i64 = row.try_get("limit_time").map_err(|e| e.to_string())?;
+        let consecutive_record: i64 = row.try_get("consecutive_record").map_err(|e| e.to_string())?;
+        let record_high: i64 = row.try_get("record_high").map_err(|e| e.to_string())?;
+
+        tasks.insert(id, Task{id, name, assignment, service, interval, limit_time, consecutive_record, record_high});
+    }
+
+    Ok(tasks.into_iter().map(|(_k, v)| v).collect())
+}
+
+#[tauri::command]
 pub async fn demo_env() -> Result<String, String> {
     // let secret_key = env::var("VITE_SUPABASE_ANON_KEY").expect("VITE_SUPABASE_ANON_KEY not set in .env");
     let secret_key = env!("SUPABASE_ANON_KEY");
 
     Ok("OK".to_string())
 }
+
